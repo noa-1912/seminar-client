@@ -1,0 +1,87 @@
+.header-appbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e8e4e0;
+}
+
+.header-toolbar {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 64px;
+  padding: 0 24px !important;
+}
+
+.header-logo {
+  color: #4a4540 !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  flex-shrink: 0;
+}
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+  margin-right: 32px;
+}
+
+.header-nav-link {
+  text-transform: none;
+  font-weight: 500;
+  min-width: auto;
+  padding: 8px 12px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  margin-right: auto;
+}
+
+.header-login {
+  color: #6b6660 !important;
+  border: 1px solid #b8b4ae;
+  border-radius: 8px;
+}
+
+.header-signup {
+  background: #f8e4ea !important;
+  color: #4a4540 !important;
+  border-radius: 8px;
+}
+
+.header-signup:hover {
+  background: #f5dde4 !important;
+}
+
+.header-menu-btn {
+  display: none !important;
+}
+
+.header-mobile-nav {
+  display: none;
+  flex-direction: column;
+  padding: 16px;
+  background: #faf9f7;
+  border-top: 1px solid #e8e4e0;
+}
+
+.header-mobile-link {
+  justify-content: flex-end;
+  padding: 12px !important;
+}
+
+@media (max-width: 900px) {
+  .header-nav,
+  .header-actions {
+    display: none !important;
+  }
+
+  .header-menu-btn {
+    display: flex !important;
+    margin-right: auto;
+  }
+
+  .header-mobile-nav {
+    display: flex;
+  }
+}
