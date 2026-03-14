@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, Typography, Chip, Alert } from '@mui/material'
-import Layout from './components/Layout'
-import './App.css'
-
+import Layout from './components/Layout/Layout';
+import './App.css';
 function App() {
   const [gatewayStatus, setGatewayStatus] = useState(null)
   const [gatewayError, setGatewayError] = useState(null)

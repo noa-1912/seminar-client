@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { colors } from '../theme/colors';
+import { colors } from "../../theme/colors";
 import './Header.css';
 
 const navLinks = [
