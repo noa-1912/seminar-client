@@ -1,0 +1,22 @@
+---
+description: Hebrew-only UI, RTL everywhere, no Hebrew comments
+alwaysApply: true
+---
+
+# Product language and direction (strict)
+
+## Must
+- All user-facing UI text must be **Hebrew only** (headings, buttons, labels, nav items, helper text, errors, empty states, aria-labels).
+- The UI must be **RTL everywhere**.
+  - Keep `dir="rtl"` and `lang="he"` in `index.html`.
+  - Keep MUI theme `direction: 'rtl'`.
+
+## Never
+- Do not ship English UI strings.
+- Do not add emojis to UI text.
+- Do not write comments in Hebrew. If a comment is necessary, write it in English (or remove it).
+
+## Enforcement checklist (before finishing any UI task)
+- Search for new strings and ensure they are Hebrew.
+- Check RTL alignment in common layouts (Navbar, forms, dialogs, tables).
+

@@ -1,0 +1,21 @@
+---
+description: Navbar/Header must match MUI spec structure
+globs: src/components/Header/**/*.{js,jsx,css}
+alwaysApply: false
+---
+
+# Navbar (Header) rules
+
+## Must
+- Use MUI `AppBar` + `Toolbar` with three zones:
+  - Logo (Hebrew brand name)
+  - Navigation links
+  - Actions (outlined login, contained signup)
+- Action buttons must be pill-shaped (`borderRadius: '999px'`).
+- All labels must be Hebrew only.
+- Use `react-router-dom` navigation (`Link`/`RouterLink`), not raw anchors.
+
+## Never
+- Do not hardcode colors in CSS for light-only. If styling is needed, rely on theme (`sx`) so dark mode works.
+- Do not use emojis in nav labels.
+

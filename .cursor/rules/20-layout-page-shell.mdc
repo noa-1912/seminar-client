@@ -1,0 +1,19 @@
+---
+description: Enforce PageShell wrapper and layout structure
+globs: src/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# Layout wrapper (PageShell) rules
+
+## Must
+- All pages must render their content inside `src/components/PageShell/PageShell.jsx`.
+- Page wrapper must follow this structure:
+  - Outer `Box`: `backgroundColor: 'background.default'`, `minHeight: '100vh'`, `py: 4`
+  - Inner `Container maxWidth="lg"`
+  - Content `Paper`/surface: `bgcolor: 'background.paper'`, `borderRadius: '24px'`, `px: 4`, `py: 3`
+
+## Never
+- Do not copy/paste wrapper code into each page.
+- Do not set page backgrounds via CSS; use theme tokens only.
+

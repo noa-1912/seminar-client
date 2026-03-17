@@ -1,24 +1,41 @@
 import { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { colors } from "../../theme/colors";
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import './Header.css';
 
 const navLinks = [
-  { label: 'Home', path: '/' },
-  { label: 'Jobs', path: '/jobs' },
-  { label: 'Profiles', path: '/profiles' },
-  { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' },
+  { label: 'דף הבית', path: '/' },
+  { label: 'משרות', path: '/jobs' },
+  { label: 'פרופילים', path: '/profiles' },
+  { label: 'אודות', path: '/about' },
+  { label: 'צור קשר', path: '/contact' },
+  { label: 'הגדרות', path: '/settings' },
 ];
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { pathname } = useLocation();
 
   return (
-    <AppBar position="sticky" className="header-appbar" elevation={0}>
+    <AppBar
+      position="sticky"
+      className="header-appbar"
+      sx={{
+        bgcolor: 'transparent',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        backdropFilter: 'blur(8px)',
+      }}
+    >
       <Toolbar className="header-toolbar">
-        <Typography variant="h6" component="a" href="/" className="header-logo">
+        <Typography
+          variant="h6"
+          component={RouterLink}
+          to="/"
+          className="header-logo"
+          sx={{ color: 'text.primary' }}
+        >
           השמה לסמינר
         </Typography>
 
@@ -26,9 +43,12 @@ function Header() {
           {navLinks.map(({ label, path }) => (
             <Button
               key={path}
-              href={path}
+              component={RouterLink}
+              to={path}
               className="header-nav-link"
-              sx={{ color: colors.textPrimary, '&:hover': { color: colors.grayDark } }}
+              color="inherit"
+              variant={pathname === path ? 'outlined' : 'text'}
+              sx={{ borderRadius: '999px' }}
             >
               {label}
             </Button>
@@ -36,11 +56,11 @@ function Header() {
         </Box>
 
         <Box className="header-actions">
-          <Button href="/login" className="header-login" size="small">
-            Login
+          <Button component={RouterLink} to="/login" className="header-login" size="small" variant="outlined">
+            התחברות
           </Button>
-          <Button href="/signup" className="header-signup" size="small" variant="contained">
-            Sign Up
+          <Button component={RouterLink} to="/signup" className="header-signup" size="small" variant="contained">
+            הרשמה
           </Button>
         </Box>
 
@@ -56,15 +76,22 @@ function Header() {
       {mobileOpen && (
         <Box className="header-mobile-nav">
           {navLinks.map(({ label, path }) => (
-            <Button key={path} href={path} fullWidth className="header-mobile-link">
+            <Button
+              key={path}
+              component={RouterLink}
+              to={path}
+              onClick={() => setMobileOpen(false)}
+              fullWidth
+              className="header-mobile-link"
+            >
               {label}
             </Button>
           ))}
-          <Button href="/login" fullWidth className="header-mobile-link">
-            Login
+          <Button component={RouterLink} to="/login" onClick={() => setMobileOpen(false)} fullWidth className="header-mobile-link">
+            התחברות
           </Button>
-          <Button href="/signup" fullWidth className="header-signup header-mobile-link">
-            Sign Up
+          <Button component={RouterLink} to="/signup" onClick={() => setMobileOpen(false)} fullWidth className="header-signup header-mobile-link">
+            הרשמה
           </Button>
         </Box>
       )}

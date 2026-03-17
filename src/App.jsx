@@ -1,36 +1,27 @@
-import { useState, useEffect } from 'react'
-import { Box, Typography, Chip, Alert } from '@mui/material'
-import Layout from './components/Layout/Layout';
-import './App.css';
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout/Layout'
+import Home from './pages/Home/Home'
+import Settings from './pages/Settings/Settings'
+import Jobs from './pages/Jobs/Jobs'
+import Profiles from './pages/Profiles/Profiles'
+import About from './pages/About/About'
+import Contact from './pages/Contact/Contact'
+import Login from './pages/Login/Login'
+import Signup from './pages/Signup/Signup'
 function App() {
-  const [gatewayStatus, setGatewayStatus] = useState(null)
-  const [gatewayError, setGatewayError] = useState(null)
-
-  useEffect(() => {
-    fetch('/gateway', { method: 'GET' })
-      .then((res) => res.text())
-      .then(() => setGatewayStatus('connected'))
-      .catch((err) => setGatewayError(err.message))
-  }, [])
-
   return (
     <Layout>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
-        ברוכים הבאים
-      </Typography>
-      <Typography variant="body1" align="center" color="text.secondary" sx={{ mb: 2 }}>
-        תוכן העמוד הראשי יופיע כאן
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap' }}>
-        {gatewayStatus && (
-          <Chip label="מחובר ל-Gateway" color="success" size="small" />
-        )}
-        {gatewayError && (
-          <Alert severity="warning" sx={{ maxWidth: 400 }}>
-            Gateway לא זמין (ודא שהוא רץ על פורט 7000). שגיאה: {gatewayError}
-          </Alert>
-        )}
-      </Box>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/profiles" element={<Profiles />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Layout>
   )
 }

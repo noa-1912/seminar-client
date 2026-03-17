@@ -1,0 +1,41 @@
+---
+description: Exact MUI theme contract (palette/typography/shape/shadows)
+globs: src/theme/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# MUI theme contract (exact)
+
+## Required light palette (must match exactly)
+- `palette.mode`: `"light"`
+- `palette.primary.main`: `#111111`
+- `palette.secondary.main`: `#f3e8e3`
+- `palette.background.default`: `#f6f1ee`
+- `palette.background.paper`: `#ffffff`
+- `palette.text.primary`: `#111111`
+- `palette.text.secondary`: `#666666`
+
+## Required dark palette (design-consistent)
+- Must provide a dark palette where:
+  - `background.default` and `background.paper` are dark surfaces
+  - `text.primary` is high-contrast (near-white)
+  - `text.secondary` is muted (gray)
+  - Components remain readable with `CssBaseline`
+
+## Typography (required)
+- `typography.fontFamily`: `"'Inter', 'Poppins', 'Assistant', 'Heebo', sans-serif"`
+- `typography.h1`: `36px / 700 / lineHeight 1.2`
+- `typography.body1`: `16px` and uses muted text tone (do not hardcode hex in components)
+- `typography.button`: `textTransform: "none"`, `fontWeight: 500`
+
+## Shape (required)
+- `shape.borderRadius`: `16`
+
+## Shadows (required)
+- Set `shadows[1]` to soft shadow:
+  - Light: `0 10px 30px rgba(0,0,0,0.05)`
+  - Dark: may be stronger but must remain soft (no harsh outlines)
+
+## Direction (required)
+- `direction: 'rtl'`
+

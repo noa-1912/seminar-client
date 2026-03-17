@@ -1,0 +1,24 @@
+---
+description: Home Hero section implementation requirements (no emojis)
+globs: src/pages/Home/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# Home Hero rules
+
+## Must
+- Use `Grid container spacing={6} alignItems="center"` for the hero layout.
+- Left side must include:
+  - `Typography variant="h1"`
+  - Supporting `Typography variant="body1"` using `text.secondary`
+  - Two CTA buttons: contained + outlined, pill-shaped
+  - Feature row with **MUI icons** (no emoji)
+- Right side must include:
+  - `Card` with `backgroundColor: 'secondary.main'`, `borderRadius: '24px'`, `p: 2`
+  - Inner image surface with `borderRadius: '16px'`
+  - A floating stat surface with `boxShadow: 1`
+
+## Never
+- Do not use emojis in feature labels.
+- Do not hardcode hex colors in the page.
+
