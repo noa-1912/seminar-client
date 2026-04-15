@@ -8,18 +8,23 @@ alwaysApply: false
 
 ## Required light palette (must match exactly)
 - `palette.mode`: `"light"`
-- `palette.primary.main`: `#111111`
-- `palette.secondary.main`: `#f3e8e3`
+- `palette.primary.main`: `#4A4540`
+- `palette.secondary.main`: `#EDE8E1`
 - `palette.background.default`: `#f6f1ee`
 - `palette.background.paper`: `#ffffff`
-- `palette.text.primary`: `#111111`
-- `palette.text.secondary`: `#666666`
+- `palette.text.primary`: `#4A4540`
+- `palette.text.secondary`: `#6B6660`
 
-## Required dark palette (design-consistent)
+## Required dark palette (warm, brand-consistent)
 - Must provide a dark palette where:
-  - `background.default` and `background.paper` are dark surfaces
-  - `text.primary` is high-contrast (near-white)
-  - `text.secondary` is muted (gray)
+  - Base surfaces are **brown/taupe**, not black/navy
+  - `background.default`: `#1A1715`
+  - `background.paper`: `#26211D`
+  - `text.primary`: `#EEE4DB` (soft off-white, not pure white)
+  - `text.secondary`: `#C5B6A7`
+  - `divider`: `#3D342D`
+  - Primary button family stays brown (`#4A4540` base, lighter hover)
+  - Pink accent language remains available via secondary/accent tokens
   - Components remain readable with `CssBaseline`
 
 ## Typography (required)
@@ -38,4 +43,9 @@ alwaysApply: false
 
 ## Direction (required)
 - `direction: 'rtl'`
+
+## Never
+- Do not use pure black (`#000000`) as dark background color.
+- Do not use dark blue/navy as base dark-mode surfaces.
+- Do not use pure white text over dark surfaces; prefer soft off-white.
 

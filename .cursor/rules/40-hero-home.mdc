@@ -17,6 +17,10 @@ alwaysApply: false
   - `Card` with `backgroundColor: 'secondary.main'`, `borderRadius: '24px'`, `p: 2`
   - Inner image surface with `borderRadius: '16px'`
   - A floating stat surface with `boxShadow: 1`
+- Hero visuals must stay consistent with the product palette:
+  - Warm brown base for dark surfaces
+  - Pink accent remains part of visual language
+  - Avoid black/navy-heavy hero backgrounds
 
 ## Never
 - Do not use emojis in feature labels.

@@ -1,20 +1,45 @@
 # תשתית Layout – השמה לסמינר טכנולוגי
 
-## פלטת צבעים (Hex)
+## שפת עיצוב מעודכנת (Light + Dark)
 
-| שם           | Hex       |
-|--------------|-----------|
-| White        | `#FFFFFF` |
-| Light Pink   | `#F8E4EA` |
-| Light Pink Alt | `#F5DDE4` |
-| Warm Beige   | `#F5F0E8` |
-| Warm Beige Alt | `#EDE8E1` |
-| Soft Gray    | `#E8E4E0` |
-| Gray Light   | `#B8B4AE` |
-| Gray Medium  | `#9A9590` |
-| Gray Dark    | `#6B6660` |
-| Text Primary | `#4A4540` |
-| Text Secondary | `#6B6660` |
+המערכת משתמשת באותה שפה ויזואלית בשני מצבים:
+
+- **Light**: בהיר, נקי, מבוסס Beige + Pink.
+- **Dark**: כהה חם ומעוצב (Brown-based), ללא שחור/כחול כהה אגרסיבי.
+- **Pink Accent** נשמר כחלק מהמותג גם במצב כהה.
+- המטרה: מראה אחיד של אותו מוצר, לא "גרסה הפוכה" של צבעים.
+
+## עקרונות צבע (חובה)
+
+- לא להשתמש ב־`#000000` כרקע ולא ב־`#FFFFFF` כטקסט ישיר במסכים.
+- טקסט כהה משתמש ב־off-white רך, לא לבן חד.
+- הפרדה בין שכבות נעשית בעזרת הבדלי גוון עדינים (`default`/`paper`/`muted`) ולא ניגוד קיצוני.
+- צבעי מותג ראשיים נשארים עקביים בין המצבים, עם התאמות עדינות לניגודיות.
+
+## טוקנים מרכזיים בפועל
+
+### Light (עוגנים מרכזיים)
+
+| קטגוריה | טוקן | ערך |
+|---------|------|-----|
+| Brand | `--color-brand-primary` | `#4A4540` |
+| Accent | `--color-light-pink` | `#F8E4EA` |
+| Page BG | `--color-bg-page` | `#F6F1EE` |
+| Surface | `--color-bg-surface` | `#FFFFFF` |
+| Text | `--color-text-primary` | `#4A4540` |
+
+### Dark (עוגנים מרכזיים - מעודכן)
+
+| קטגוריה | טוקן | ערך |
+|---------|------|-----|
+| Brand | `--color-brand-primary` | `#4A4540` |
+| Accent (Pink) | `--color-brand-secondary` | `#F5DDE4` |
+| Page BG | `--color-bg-page` | `#1A1715` |
+| Surface | `--color-bg-surface` | `#26211D` |
+| Muted Surface | `--color-bg-muted` | `#302924` |
+| Text Primary | `--color-text-primary` | `#EEE4DB` |
+| Text Secondary | `--color-text-secondary` | `#C5B6A7` |
+| Border Soft | `--color-border-soft` | `#3D342D` |
 
 ---
 
@@ -23,7 +48,11 @@
 | קובץ | תיאור |
 |------|-------|
 | `src/theme/colors.js` | פלטת צבעים |
-| `src/theme/index.js` | Theme של MUI |
+| `src/theme/Theme.css` | טוקנים גלובליים + Light/Dark overrides |
+| `src/theme/createAppTheme.js` | Theme של MUI (כולל התאמות Dark חומות) |
+| `src/theme/ThemeModeProvider.jsx` | ניהול מצב Theme ושמירה ב־localStorage |
+| `src/theme/useThemeMode.js` | Hook לשימוש במצב Theme |
+| `src/theme/themeModeContext.js` | Context למצב Theme |
 | `src/components/Header.jsx` | Header גלובלי |
 | `src/components/Header.css` | עיצוב Header |
 | `src/components/Footer.jsx` | Footer גלובלי |
@@ -111,19 +140,23 @@ function App() {
   - בסיס: `.btn`
   - ראשי: `.btn--primary`
   - משני: `.btn--secondary`
+- עבור Dark Mode: לשמור על גוונים חומים-חמים ושכבת Accent ורודה.
 
 ### מה מותר להרחיב
 
 - מותר להוסיף טוקנים חדשים תחת `:root` באותו קובץ בלבד
 - מותר להוסיף override ל־`[data-theme='dark']` עבור כל טוקן חדש
 - מותר להוסיף מחלקות Utility חדשות אם הן מבוססות על טוקנים קיימים
+- מותר להוסיף וריאציות צבע כהות כל עוד הן נשארות באותה משפחה חמה (Brown/Taupe)
 
 ### Do / Don't
 
 - Do: להשתמש ב־`var(--token-name)` בכל קומפוננטה משותפת
 - Do: למפות רכיבי MUI דרך `createAppTheme.js` לאותם טוקנים
+- Do: לשמור Dark Mode אחיד עם כפתורי Brown וה־Pink Accent
 - Don't: לכתוב ערכי hex קשיחים בקבצי Header/Footer/Layout משותפים
 - Don't: להגדיר font-size/color ישירות כשיש טוקן מתאים
+- Don't: להחזיר שחור/כחול כהה כבסיס ל־Dark Mode
 
 ### דוגמת שימוש מהירה
 

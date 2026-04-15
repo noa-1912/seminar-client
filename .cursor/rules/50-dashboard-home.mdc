@@ -11,7 +11,10 @@ alwaysApply: false
 - Use MUI `Card` surfaces for panels.
 - Use `List` + `ListItem` + `Avatar` for candidate/user rows.
 - All copy must be Hebrew only.
+- In dark mode, panel surfaces and section backgrounds must use warm brown layered tones from theme tokens.
+- Preserve pink accent usage where relevant to maintain brand consistency.
 
 ## Never
 - Do not embed layout-critical styles in CSS; use MUI `sx` + theme tokens.
+- Do not use black/navy hardcoded dark backgrounds in dashboard sections.
 
