@@ -6,4 +6,8 @@ body,
 
 body {
   margin: 0;
+  font-family: var(--font-family-base);
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-base);
 }

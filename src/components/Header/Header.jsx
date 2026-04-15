@@ -45,10 +45,9 @@ function Header() {
               key={path}
               component={RouterLink}
               to={path}
-              className="header-nav-link"
+              className={`header-nav-link btn ${pathname === path ? 'btn--secondary' : ''}`}
               color="inherit"
               variant={pathname === path ? 'outlined' : 'text'}
-              sx={{ borderRadius: '999px' }}
             >
               {label}
             </Button>
@@ -56,10 +55,10 @@ function Header() {
         </Box>
 
         <Box className="header-actions">
-          <Button component={RouterLink} to="/login" className="header-login" size="small" variant="outlined">
+          <Button component={RouterLink} to="/login" className="header-login btn btn--secondary" size="small" variant="outlined">
             התחברות
           </Button>
-          <Button component={RouterLink} to="/signup" className="header-signup" size="small" variant="contained">
+          <Button component={RouterLink} to="/signup" className="header-signup btn btn--primary" size="small" variant="contained">
             הרשמה
           </Button>
         </Box>
@@ -82,15 +81,29 @@ function Header() {
               to={path}
               onClick={() => setMobileOpen(false)}
               fullWidth
-              className="header-mobile-link"
+              className={`header-mobile-link btn ${pathname === path ? 'btn--secondary' : ''}`}
             >
               {label}
             </Button>
           ))}
-          <Button component={RouterLink} to="/login" onClick={() => setMobileOpen(false)} fullWidth className="header-mobile-link">
+          <Button
+            component={RouterLink}
+            to="/login"
+            onClick={() => setMobileOpen(false)}
+            fullWidth
+            className="header-mobile-link btn btn--secondary"
+            variant="outlined"
+          >
             התחברות
           </Button>
-          <Button component={RouterLink} to="/signup" onClick={() => setMobileOpen(false)} fullWidth className="header-signup header-mobile-link">
+          <Button
+            component={RouterLink}
+            to="/signup"
+            onClick={() => setMobileOpen(false)}
+            fullWidth
+            className="header-signup header-mobile-link btn btn--primary"
+            variant="contained"
+          >
             הרשמה
           </Button>
         </Box>

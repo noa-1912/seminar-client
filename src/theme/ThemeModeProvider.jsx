@@ -4,16 +4,30 @@ import createAppTheme from './createAppTheme';
 import { ThemeModeContext } from './themeModeContext';
 
 function getInitialMode() {
-  const saved = localStorage.getItem('themeMode');
-  if (saved === 'light' || saved === 'dark') return saved;
-  return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
+  try {
+    const saved = window.localStorage.getItem('themeMode');
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch {
+    // Ignore storage access errors and use system/default mode.
+  }
+
+  try {
+    return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
 }
 
 export function ThemeModeProvider({ children }) {
   const [mode, setMode] = useState(getInitialMode);
 
   useEffect(() => {
-    localStorage.setItem('themeMode', mode);
+    try {
+      window.localStorage.setItem('themeMode', mode);
+    } catch {
+      // Ignore storage access errors.
+    }
+    document.documentElement.setAttribute('data-theme', mode);
   }, [mode]);
 
   const toggleMode = useCallback(() => {

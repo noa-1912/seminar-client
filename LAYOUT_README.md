@@ -96,3 +96,41 @@ function App() {
 - קישורים מהירים
 - פרטי קשר (דוא״ל, טלפון)
 - זכויות יוצרים
+
+---
+
+## Theme.css – הנחיות לכל הצוותים
+
+`src/theme/Theme.css` הוא מקור האמת של מערכת העיצוב.
+
+### מה חובה להשתמש
+
+- צבעים דרך משתנים בלבד: `--color-*` (למשל `--color-text-primary`)
+- טיפוגרפיה דרך משתנים: `--font-family-*`, `--font-size-*`, `--line-height-*`
+- כפתורים משותפים:
+  - בסיס: `.btn`
+  - ראשי: `.btn--primary`
+  - משני: `.btn--secondary`
+
+### מה מותר להרחיב
+
+- מותר להוסיף טוקנים חדשים תחת `:root` באותו קובץ בלבד
+- מותר להוסיף override ל־`[data-theme='dark']` עבור כל טוקן חדש
+- מותר להוסיף מחלקות Utility חדשות אם הן מבוססות על טוקנים קיימים
+
+### Do / Don't
+
+- Do: להשתמש ב־`var(--token-name)` בכל קומפוננטה משותפת
+- Do: למפות רכיבי MUI דרך `createAppTheme.js` לאותם טוקנים
+- Don't: לכתוב ערכי hex קשיחים בקבצי Header/Footer/Layout משותפים
+- Don't: להגדיר font-size/color ישירות כשיש טוקן מתאים
+
+### דוגמת שימוש מהירה
+
+```css
+.my-team-card-title {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-h6);
+}
+```
