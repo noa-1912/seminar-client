@@ -3,6 +3,12 @@ import Layout from './components/Layout/Layout'
 import Home from './pages/Home/Home'
 import Settings from './pages/Settings/Settings'
 import Jobs from './pages/Jobs/Jobs'
+import {
+  ManageJobApplications,
+  MyApplications,
+  PersonalArea,
+  PrivateInvitations,
+} from './features/jobs'
 import Profiles from './pages/Profiles/Profiles'
 import About from './pages/About/About'
 import Contact from './pages/Contact/Contact'
@@ -14,6 +20,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
+        <Route path="/personal-area" element={<PersonalArea />} />
+        <Route path="/my-applications" element={<MyApplications />} />
+        <Route path="/private-invitations" element={<PrivateInvitations />} />
         <Route path="/profiles" element={<Profiles />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
