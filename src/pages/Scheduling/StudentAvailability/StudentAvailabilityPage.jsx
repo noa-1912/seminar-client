@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, LinearProgress, Paper, Snackbar, Stack, Typography } from '@mui/material';
 import PageShell from '../../../components/PageShell/PageShell';
-import StudentAvailabilityCalendar from '../../../components/Scheduling/StudentAvailabilityCalendar';
+import StudentAvailabilityCalendar from '../../../components/Scheduling/StudentAvailabilityCalender/StudentAvailabilityCalendar';
 import {
   createStudentAvailability,
   deleteStudentAvailability,
