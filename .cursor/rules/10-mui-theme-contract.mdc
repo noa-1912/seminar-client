@@ -1,0 +1,51 @@
+---
+description: Exact MUI theme contract (palette/typography/shape/shadows)
+globs: src/theme/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# MUI theme contract (exact)
+
+## Required light palette (must match exactly)
+- `palette.mode`: `"light"`
+- `palette.primary.main`: `#4A4540`
+- `palette.secondary.main`: `#EDE8E1`
+- `palette.background.default`: `#f6f1ee`
+- `palette.background.paper`: `#ffffff`
+- `palette.text.primary`: `#4A4540`
+- `palette.text.secondary`: `#6B6660`
+
+## Required dark palette (warm, brand-consistent)
+- Must provide a dark palette where:
+  - Base surfaces are **brown/taupe**, not black/navy
+  - `background.default`: `#1A1715`
+  - `background.paper`: `#26211D`
+  - `text.primary`: `#EEE4DB` (soft off-white, not pure white)
+  - `text.secondary`: `#C5B6A7`
+  - `divider`: `#3D342D`
+  - Primary button family stays brown (`#4A4540` base, lighter hover)
+  - Pink accent language remains available via secondary/accent tokens
+  - Components remain readable with `CssBaseline`
+
+## Typography (required)
+- `typography.fontFamily`: `"'Inter', 'Poppins', 'Assistant', 'Heebo', sans-serif"`
+- `typography.h1`: `36px / 700 / lineHeight 1.2`
+- `typography.body1`: `16px` and uses muted text tone (do not hardcode hex in components)
+- `typography.button`: `textTransform: "none"`, `fontWeight: 500`
+
+## Shape (required)
+- `shape.borderRadius`: `16`
+
+## Shadows (required)
+- Set `shadows[1]` to soft shadow:
+  - Light: `0 10px 30px rgba(0,0,0,0.05)`
+  - Dark: may be stronger but must remain soft (no harsh outlines)
+
+## Direction (required)
+- `direction: 'rtl'`
+
+## Never
+- Do not use pure black (`#000000`) as dark background color.
+- Do not use dark blue/navy as base dark-mode surfaces.
+- Do not use pure white text over dark surfaces; prefer soft off-white.
+

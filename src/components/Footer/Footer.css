@@ -1,0 +1,105 @@
+.footer {
+  margin-top: auto;
+  background: var(--color-overlay-soft);
+  backdrop-filter: blur(8px);
+  padding: var(--space-10) 0 var(--space-6);
+  border-top: 1px solid var(--color-border-soft);
+  font-family: var(--font-family-base);
+}
+
+.footer-container {
+  max-width: 1200px;
+  padding: 0 var(--space-6);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer-title {
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
+  font-size: var(--font-size-h6) !important;
+  font-family: var(--font-family-heading) !important;
+  line-height: var(--line-height-tight) !important;
+}
+
+.footer-desc {
+  color: var(--color-text-secondary) !important;
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-body-sm) !important;
+  max-width: 320px;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.footer-link {
+  color: var(--color-text-primary) !important;
+  text-decoration: none !important;
+  font-size: var(--font-size-body-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  padding: var(--space-1) var(--space-3);
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+.footer-link:hover {
+  color: var(--color-text-primary) !important;
+  background-color: var(--btn-secondary-hover-bg);
+  border-color: var(--btn-secondary-hover-border);
+}
+
+.footer-contact {
+  color: var(--color-text-secondary) !important;
+  font-size: var(--font-size-body-sm) !important;
+}
+
+.footer-bottom {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.footer-copyright {
+  color: var(--color-gray-medium) !important;
+  text-align: center;
+  font-size: var(--font-size-body-sm) !important;
+}
+
+@media (max-width: 900px) {
+  .footer {
+    padding-top: var(--space-8);
+  }
+
+  .footer-container {
+    padding: 0 var(--space-4);
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
+    text-align: center;
+  }
+
+  .footer-desc {
+    max-width: 100%;
+  }
+
+  .footer-links {
+    align-items: center;
+  }
+}

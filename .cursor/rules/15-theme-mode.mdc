@@ -1,0 +1,27 @@
+---
+description: Global light/dark mode (localStorage) and theme-only colors
+alwaysApply: true
+---
+
+# Theme mode (light/dark) requirements
+
+## Must
+- The app must support **light and dark** mode across the entire UI.
+- Theme mode must be **persisted in `localStorage`** under key `themeMode`.
+- Mode must apply globally via a single `ThemeProvider` (no per-page theme providers).
+- All background/text/surface colors must come from MUI theme tokens (`theme.palette.*`) so both modes render correctly.
+- Dark mode must follow the approved warm palette:
+  - Brown-based surfaces (`background.default` / `background.paper`)
+  - Soft off-white primary text
+  - Pink accent language preserved
+- Primary CTA style in dark mode must remain in the same brown family as light brand identity.
+
+## Never
+- Do not hardcode hex colors in components (allowed only inside the theme builder).
+- Do not use CSS to set page backgrounds or text colors in a way that conflicts with MUI theme / `CssBaseline`.
+- Do not design dark mode as pure black, flat monochrome, or navy-heavy UI.
+
+## Reference implementation (required shape)
+- Theme factory: `src/theme/createAppTheme.js` exporting `createAppTheme(mode)`.
+- Provider: `src/theme/ThemeModeProvider.jsx` exporting `ThemeModeProvider` and `useThemeMode()`.
+
