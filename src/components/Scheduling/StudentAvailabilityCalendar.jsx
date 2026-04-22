@@ -27,7 +27,18 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { HDate, gematriya, getSedra } from '@hebcal/core';
 
-import './StudentAvailabilityCalendar.css';
+/** Square-first UI: only subtle corners, no pills or circles */
+const SQ = 4;
+
+const textFieldSquareSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: `${SQ}px`,
+  },
+};
+
+const chipSquareSx = { borderRadius: `${SQ}px` };
+
+const btnSquareSx = { borderRadius: `${SQ}px` };
 
 const AvailabilityStatus = {
   Available: 0,
@@ -416,7 +427,7 @@ function SlotAvailabilityLineToggle({ available, onChange, dense, ariaLabel }) {
         sx={{
           mx: 0,
           '& .MuiSwitch-track': {
-            borderRadius: 4,
+            borderRadius: `${SQ}px`,
             opacity: 1,
             backgroundColor: trackOff,
           },
@@ -723,7 +734,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                     aria-label="חודש קודם"
                     onClick={() => setCursorMonth((m) => addMonths(m, -1))}
                     size="small"
-                    className="sac-btnSquare"
+                    sx={btnSquareSx}
                   >
                     <ChevronRightIcon />
                   </IconButton>
@@ -733,7 +744,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                     aria-label="חודש הבא"
                     onClick={() => setCursorMonth((m) => addMonths(m, 1))}
                     size="small"
-                    className="sac-btnSquare"
+                    sx={btnSquareSx}
                   >
                     <ChevronLeftIcon />
                   </IconButton>
@@ -747,7 +758,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                     if (toIsoDateKey(next) === cursorMonthKey) return;
                     setCursorMonth(next);
                   }}
-                  className="sac-btnSquare"
+                  sx={btnSquareSx}
                 >
                   חזרה להיום
                 </Button>
@@ -761,6 +772,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                 size="small"
                 label={monthSummaryLabels.editing}
                 sx={{
+                  ...chipSquareSx,
                   borderRadius: summaryPillRadius,
                   height: 32,
                   bgcolor: summaryMutedFill,
@@ -774,6 +786,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                 variant="outlined"
                 label={monthSummaryLabels.exceptions}
                 sx={{
+                  ...chipSquareSx,
                   borderRadius: summaryPillRadius,
                   height: 32,
                   fontWeight: 600,
@@ -786,6 +799,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                 variant="outlined"
                 label={monthSummaryLabels.unavailable}
                 sx={{
+                  ...chipSquareSx,
                   borderRadius: summaryPillRadius,
                   height: 32,
                   fontWeight: 600,
@@ -804,6 +818,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                 size="small"
                 label='טיפ: זמין כל היום ואז חוסמים שעות'
                 sx={{
+                  ...chipSquareSx,
                   borderRadius: summaryPillRadius,
                   height: 32,
                   bgcolor: summaryMutedFill,
@@ -817,6 +832,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                 variant="outlined"
                 label='טיפ: לא זמין כל היום ואז מוסיפים שעות זמינות'
                 sx={{
+                  ...chipSquareSx,
                   borderRadius: summaryPillRadius,
                   height: 32,
                   fontWeight: 600,
@@ -898,7 +914,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                   sx={{
                     width: 12,
                     height: 12,
-                    borderRadius: 4,
+                    borderRadius: `${SQ}px`,
                     bgcolor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.2 : 0.12),
                     flexShrink: 0,
                     border: '1px solid',
@@ -916,8 +932,8 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
 
       <Paper
         elevation={0}
-        className="sac-square"
         sx={{
+          borderRadius: `${SQ}px`,
           overflow: 'hidden',
           border: '1px solid',
           borderColor: 'divider',
@@ -953,10 +969,10 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                 return (
                   <Box
                     key={`empty-${idx}`}
-                    className="sac-square"
                     sx={{
                       aspectRatio: '1 / 1',
                       minHeight: { xs: 72, sm: 88 },
+                      borderRadius: `${SQ}px`,
                     }}
                   />
                 );
@@ -991,10 +1007,10 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                   disabled={disabled}
                   aria-label={dayAriaLabel(date, summary, disabled)}
                   variant="text"
-                  className="sac-square"
                   sx={{
                     aspectRatio: '1 / 1',
                     minHeight: { xs: 72, sm: 88 },
+                    borderRadius: `${SQ}px`,
                     p: 1.25,
                     textAlign: 'right',
                     justifyContent: 'flex-start',
@@ -1069,8 +1085,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                               <Typography
                                 variant="caption"
                                 color="text.secondary"
-                                className="sac-twoLineClamp"
-                                sx={{ lineHeight: 1.15, fontSize: '0.72rem' }}
+                                sx={{ lineHeight: 1.15, fontSize: '0.72rem', display: '-webkit-box', overflow: 'hidden', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
                               >
                                 {hebrewCalLine}
                               </Typography>
@@ -1082,10 +1097,10 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                             ) : null}
                           </Stack>
                           <Box
-                            className="sac-square"
                             sx={{
                               px: 1,
                               py: 0.25,
+                              borderRadius: `${SQ}px`,
                               bgcolor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.12 : 0.08),
                               border: '1px solid',
                               borderColor: 'divider',
@@ -1136,10 +1151,10 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                           </Stack>
 
                           <Box
-                            className="sac-square"
                             sx={{
                               px: 1,
                               py: 0.25,
+                              borderRadius: `${SQ}px`,
                               bgcolor: statusTint,
                               border: '1px solid',
                               borderColor: alpha(statusColor, theme.palette.mode === 'dark' ? 0.35 : 0.28),
@@ -1158,8 +1173,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                             color="info"
                             variant="outlined"
                             label={exceptionsCount === 1 ? 'חריגה אחת לשעות' : `${exceptionsCount} חריגות לשעות`}
-                            className="sac-chipSquare"
-                            sx={{ alignSelf: 'flex-start', fontWeight: 600, maxWidth: '100%' }}
+                            sx={{ ...chipSquareSx, alignSelf: 'flex-start', fontWeight: 600, maxWidth: '100%' }}
                           />
                         ) : (
                           <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.25, fontWeight: 500 }}>
@@ -1168,7 +1182,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                         )}
 
                         {summary ? (
-                          <Typography variant="caption" color="text.secondary" className="sac-twoLineClamp" sx={{ lineHeight: 1.25 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.25, display: '-webkit-box', overflow: 'hidden', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                             {summary.text}
                           </Typography>
                         ) : null}
@@ -1218,7 +1232,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
               </Typography>
             </Stack>
 
-            <IconButton aria-label="סגירה" onClick={closeDrawerAndCommit} size="small" className="sac-btnSquare">
+            <IconButton aria-label="סגירה" onClick={closeDrawerAndCommit} size="small" sx={btnSquareSx}>
               <CloseIcon />
             </IconButton>
           </Stack>
@@ -1226,7 +1240,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
           <Divider />
 
           <Stack spacing={2}>
-            <Card variant="outlined" className="sac-square" sx={{ bgcolor: 'background.paper' }}>
+            <Card variant="outlined" sx={{ borderRadius: `${SQ}px`, bgcolor: 'background.paper' }}>
               <CardContent>
                 <Stack spacing={1.5}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -1242,7 +1256,14 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                     }}
                     aria-label="מצב יום"
                     fullWidth
-                    className="sac-toggleSquare"
+                    sx={{
+                      '& .MuiToggleButtonGroup-grouped': { borderRadius: `${SQ}px` },
+                      '& .MuiToggleButton-root': {
+                        flex: 1,
+                        py: 1,
+                        borderRadius: `${SQ}px`,
+                      },
+                    }}
                   >
                     <ToggleButton value={AvailabilityStatus.Available} aria-label="זמין כל היום">
                       זמין/ה כל היום
@@ -1262,7 +1283,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
             </Card>
 
             {selectedDayStatus === AvailabilityStatus.Unavailable ? (
-              <Card variant="outlined" className="sac-square" sx={{ bgcolor: 'background.paper' }}>
+              <Card variant="outlined" sx={{ borderRadius: `${SQ}px`, bgcolor: 'background.paper' }}>
                 <CardContent>
                   <Stack spacing={1.5}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -1274,7 +1295,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                         onClick={() => setSelectedDayEntry({ dayReasonStatus: AvailabilityReasonKind.Personal })}
                         variant={selectedDayReasonStatus === AvailabilityReasonKind.Personal ? 'filled' : 'outlined'}
                         label="פרטי"
-                        className="sac-chipSquare"
+                        sx={chipSquareSx}
                       />
                       <Chip
                         clickable
@@ -1286,7 +1307,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                         }
                         variant={selectedDayReasonStatus === AvailabilityReasonKind.Interview ? 'filled' : 'outlined'}
                         label="ראיון"
-                        className="sac-chipSquare"
+                        sx={chipSquareSx}
                       />
                     </Stack>
                     {selectedDayReasonStatus === AvailabilityReasonKind.Personal ? (
@@ -1295,7 +1316,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                         value={selectedDayReasonStudent}
                         onChange={(e) => setSelectedDayEntry({ dayReasonStudent: e.target.value })}
                         fullWidth
-                        className="sac-textFieldSquare"
+                        sx={textFieldSquareSx}
                       />
                     ) : null}
                   </Stack>
@@ -1303,7 +1324,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
               </Card>
             ) : null}
 
-            <Card variant="outlined" className="sac-square" sx={{ bgcolor: 'background.paper' }}>
+            <Card variant="outlined" sx={{ borderRadius: `${SQ}px`, bgcolor: 'background.paper' }}>
               <CardContent>
                 <Stack spacing={1.5}>
                   <Stack spacing={0.5}>
@@ -1329,7 +1350,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                           onClick={() => setNewReasonStatus(AvailabilityReasonKind.Personal)}
                           variant={newReasonStatus === AvailabilityReasonKind.Personal ? 'filled' : 'outlined'}
                           label="פרטי"
-                          className="sac-chipSquare"
+                          sx={chipSquareSx}
                         />
                         <Chip
                           clickable
@@ -1339,7 +1360,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                           }}
                           variant={newReasonStatus === AvailabilityReasonKind.Interview ? 'filled' : 'outlined'}
                           label="ראיון"
-                          className="sac-chipSquare"
+                          sx={chipSquareSx}
                         />
                       </Stack>
                       {newReasonStatus === AvailabilityReasonKind.Personal ? (
@@ -1348,7 +1369,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                           value={newReasonStudent}
                           onChange={(e) => setNewReasonStudent(e.target.value)}
                           fullWidth
-                          className="sac-textFieldSquare"
+                          sx={textFieldSquareSx}
                         />
                       ) : null}
                     </Stack>
@@ -1363,7 +1384,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                       fullWidth
                       InputLabelProps={{ shrink: true }}
                       inputProps={{ step: 300 }}
-                      className="sac-textFieldSquare"
+                      sx={textFieldSquareSx}
                     />
                     <TextField
                       label="סיום"
@@ -1375,7 +1396,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                       inputProps={{ step: 300 }}
                       error={Boolean(newSlotError)}
                       helperText={newSlotError || ' '}
-                      className="sac-textFieldSquare"
+                      sx={textFieldSquareSx}
                     />
                   </Stack>
 
@@ -1386,17 +1407,17 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                       onClick={commitAddNewSlot}
                       disabled={Boolean(newSlotError)}
                       variant="contained"
-                      className="sac-btnSquare"
+                      sx={btnSquareSx}
                     >
                       הוספה
                     </Button>
-                    <Button onClick={() => quickAdd('morning')} variant="outlined" className="sac-btnSquare">
+                    <Button onClick={() => quickAdd('morning')} variant="outlined" sx={btnSquareSx}>
                       בוקר (09–12)
                     </Button>
-                    <Button onClick={() => quickAdd('noon')} variant="outlined" className="sac-btnSquare">
+                    <Button onClick={() => quickAdd('noon')} variant="outlined" sx={btnSquareSx}>
                       צהריים (12–15)
                     </Button>
-                    <Button onClick={() => quickAdd('evening')} variant="outlined" className="sac-btnSquare">
+                    <Button onClick={() => quickAdd('evening')} variant="outlined" sx={btnSquareSx}>
                       אחה״צ (15–18)
                     </Button>
                   </Stack>
@@ -1405,7 +1426,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
             </Card>
           </Stack>
 
-          <Card variant="outlined" className="sac-square" sx={{ bgcolor: 'background.paper' }}>
+          <Card variant="outlined" sx={{ borderRadius: `${SQ}px`, bgcolor: 'background.paper' }}>
             <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: subtleHeaderBg }}>
               {(() => {
                 const availableExceptions = selectedSlots.filter((s) => s.status === AvailabilityStatus.Available).length;
@@ -1422,12 +1443,12 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                     </Stack>
 
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                      <Chip size="small" variant="outlined" label={`${selectedSlots.length} חריגות`} className="sac-chipSquare" />
+                      <Chip size="small" variant="outlined" label={`${selectedSlots.length} חריגות`} sx={chipSquareSx} />
                       {availableExceptions > 0 ? (
-                        <Chip size="small" color="success" variant="outlined" label={`${availableExceptions} זמינות`} className="sac-chipSquare" />
+                        <Chip size="small" color="success" variant="outlined" label={`${availableExceptions} זמינות`} sx={chipSquareSx} />
                       ) : null}
                       {blockedExceptions > 0 ? (
-                        <Chip size="small" color="error" variant="outlined" label={`${blockedExceptions} חסומות`} className="sac-chipSquare" />
+                        <Chip size="small" color="error" variant="outlined" label={`${blockedExceptions} חסומות`} sx={chipSquareSx} />
                       ) : null}
                     </Stack>
                   </Stack>
@@ -1438,9 +1459,9 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
             <CardContent sx={{ maxHeight: 'min(360px, 50vh)', overflowY: 'auto' }}>
               {selectedSlots.length === 0 ? (
                 <Box
-                  className="sac-square"
                   sx={{
                     p: 2,
+                    borderRadius: `${SQ}px`,
                     border: '1px dashed',
                     borderColor: 'divider',
                     bgcolor: 'background.default',
@@ -1463,8 +1484,8 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                       <Paper
                         key={`${slot.start}-${slot.end}-${idx}`}
                         elevation={0}
-                        className="sac-square"
                         sx={{
+                          borderRadius: `${SQ}px`,
                           overflow: 'hidden',
                           border: '1px solid',
                           borderColor: 'divider',
@@ -1502,8 +1523,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                                   color="inherit"
                                   onClick={() => removeSlot(idx)}
                                   aria-label="מחיקה"
-                                  className="sac-btnSquare"
-                                  sx={{ fontWeight: 500 }}
+                                  sx={{ fontWeight: 500, ...btnSquareSx }}
                                 >
                                   מחיקה
                                 </Button>
@@ -1520,7 +1540,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                                       onClick={() => updateSlot(idx, { reasonStatus: AvailabilityReasonKind.Personal })}
                                       variant={slot.reasonStatus === AvailabilityReasonKind.Personal ? 'filled' : 'outlined'}
                                       label="פרטי"
-                                      className="sac-chipSquare"
+                                      sx={chipSquareSx}
                                     />
                                     <Chip
                                       clickable
@@ -1532,7 +1552,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                                       }
                                       variant={slot.reasonStatus === AvailabilityReasonKind.Interview ? 'filled' : 'outlined'}
                                       label="ראיון"
-                                      className="sac-chipSquare"
+                                      sx={chipSquareSx}
                                     />
                                   </Stack>
                                   {slot.reasonStatus === AvailabilityReasonKind.Personal ? (
@@ -1541,7 +1561,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
                                       value={slot.reasonStudent || ''}
                                       onChange={(e) => updateSlot(idx, { reasonStudent: e.target.value })}
                                       fullWidth
-                                      className="sac-textFieldSquare"
+                                      sx={textFieldSquareSx}
                                     />
                                   ) : null}
                                 </Stack>
@@ -1568,7 +1588,7 @@ export default function StudentAvailabilityCalendar({ value, onChange, onCommitD
               borderColor: 'divider',
             }}
           >
-            <Button variant="contained" onClick={closeDrawerAndCommit} className="sac-btnSquare">
+            <Button variant="contained" onClick={closeDrawerAndCommit} sx={btnSquareSx}>
               סיום
             </Button>
           </Box>
