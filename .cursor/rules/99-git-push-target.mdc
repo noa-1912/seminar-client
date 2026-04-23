@@ -1,0 +1,16 @@
+---
+description: Git push target policy for seminar-client
+alwaysApply: true
+---
+
+# Git Push Target (Client Repo)
+
+- Repository: `seminar-client`
+- Default working branch: `feature/jobs`
+- Default push target: `origin feature/jobs`
+
+## Commit/Push Guidance
+
+- Create and push client-related commits to `feature/jobs`.
+- Do not push client commits to `main` unless explicitly requested.
+- If push is rejected (non-fast-forward), rebase on `origin/feature/jobs` and push again without force.
