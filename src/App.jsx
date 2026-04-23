@@ -14,11 +14,13 @@ import About from './pages/About/About'
 import Contact from './pages/Contact/Contact'
 import Login from './pages/Login/Login'
 import Signup from './pages/Signup/Signup'
+import AdminDashboard from './components/admin/AdminDashboard'
 function App() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
         <Route path="/personal-area" element={<PersonalArea />} />
