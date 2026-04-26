@@ -8,6 +8,7 @@ import About from './pages/About/About'
 import Contact from './pages/Contact/Contact'
 import Login from './pages/Login/Login'
 import Signup from './pages/Signup/Signup'
+import StudentAvailabilityPage from './pages/Scheduling/StudentAvailability/StudentAvailabilityPage.jsx'
 function App() {
   return (
     <Layout>
@@ -20,6 +21,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/student-availability" element={<StudentAvailabilityPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
