@@ -2,8 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
 import Home from './pages/Home/Home'
 import Settings from './pages/Settings/Settings'
-import Jobs from './pages/Jobs/Jobs'
 import {
+  JobsBoardPage,
   ManageJobApplications,
   MyApplications,
   PersonalArea,
@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs" element={<JobsBoardPage />} />
         <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
         <Route path="/personal-area" element={<PersonalArea />} />
         <Route path="/my-applications" element={<MyApplications />} />
