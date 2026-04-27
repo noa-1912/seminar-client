@@ -19,6 +19,7 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import CreateJobForm from "./CreateJobForm";
+import ManagementTable from "./ManagementTable";
 import { getAdminDashboardStats } from "./adminService";
 import "./jobsAdmin.css";
 import "../../theme/Theme.css";
@@ -160,6 +161,8 @@ export default function AdminDashboard() {
           </Grid>
         ))}
       </Grid>
+
+      <ManagementTable />
 
       <Dialog
         fullWidth

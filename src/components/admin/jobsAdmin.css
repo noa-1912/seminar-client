@@ -42,3 +42,20 @@
   color: var(--color-text-primary);
   font-family: var(--font-family-heading);
 }
+
+.jobs-admin__management {
+  margin-top: var(--space-6);
+}
+
+.jobs-admin__management-title {
+  margin-bottom: var(--space-3);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+}
+
+.jobs-admin__management-table {
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}

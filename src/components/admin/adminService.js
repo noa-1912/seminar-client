@@ -1,4 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5243/api";
+let devManagerTokenPromise = null;
 
 function getAuthToken() {
   return (
@@ -18,11 +19,50 @@ function buildHeaders(customHeaders = {}) {
   };
 }
 
+async function ensureDevManagerToken() {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+
+  if (!devManagerTokenPromise) {
+    devManagerTokenPromise = (async () => {
+      const response = await fetch(`${API_BASE_URL}/testauth/manager-token`);
+      if (!response.ok) {
+        throw new Error(`Failed to get dev manager token (${response.status})`);
+      }
+
+      const payload = await response.json();
+      const token = payload?.token;
+      if (!token) {
+        throw new Error("Dev manager token payload is missing token.");
+      }
+
+      window.localStorage.setItem("authToken", token);
+    })().finally(() => {
+      devManagerTokenPromise = null;
+    });
+  }
+
+  await devManagerTokenPromise;
+}
+
 async function fetchJson(url, options = {}) {
-  const response = await fetch(url, {
+  await ensureDevManagerToken();
+
+  let response = await fetch(url, {
     ...options,
     headers: buildHeaders(options.headers),
   });
+
+  if (import.meta.env.DEV && (response.status === 401 || response.status === 403)) {
+    window.localStorage.removeItem("authToken");
+    window.localStorage.removeItem("token");
+    await ensureDevManagerToken();
+    response = await fetch(url, {
+      ...options,
+      headers: buildHeaders(options.headers),
+    });
+  }
 
   if (!response.ok) {
     const suffix = response.status === 401 ? " (unauthorized)" : "";
@@ -36,8 +76,24 @@ async function fetchJson(url, options = {}) {
   return response.json();
 }
 
-function isUnauthorizedError(error) {
-  return String(error?.message || "").includes("401");
+function pickArray(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.items)) {
+    return payload.items;
+  }
+
+  if (Array.isArray(payload?.Items)) {
+    return payload.Items;
+  }
+
+  return [];
+}
+
+function pickTotalCount(payload) {
+  return payload?.totalCount ?? payload?.TotalCount ?? 0;
 }
 
 async function getJobsCountByStatus(statuses = []) {
@@ -51,46 +107,58 @@ async function getJobsCountByStatus(statuses = []) {
 
   const data = await fetchJson(`${API_BASE_URL}/jobs?${params.toString()}`);
 
-  // Supports both camelCase and PascalCase API naming.
-  return data?.totalCount ?? data?.TotalCount ?? 0;
+  return pickTotalCount(data);
 }
 
 export async function createJob(payload) {
-  try {
-    return await fetchJson(`${API_BASE_URL}/jobs`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    if (isUnauthorizedError(error)) {
-      return fetchJson(`${API_BASE_URL}/mock/admin/jobs`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-    }
-    throw error;
-  }
+  return fetchJson(`${API_BASE_URL}/jobs`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function getAdminDashboardStats() {
-  try {
-    // Backend currently exposes counts through paginated jobs endpoints.
-    const [totalJobs, openJobs, closedJobs] = await Promise.all([
-      getJobsCountByStatus([]),
-      getJobsCountByStatus(["Open"]),
-      getJobsCountByStatus(["Closed"]),
-    ]);
+  const [totalJobs, openJobs, closedJobs] = await Promise.all([
+    getJobsCountByStatus([]),
+    getJobsCountByStatus(["Open"]),
+    getJobsCountByStatus(["Closed"]),
+  ]);
 
-    return {
-      totalJobs,
-      openJobs,
-      closedJobs,
-      placementsCompleted: closedJobs,
-    };
-  } catch (error) {
-    if (isUnauthorizedError(error)) {
-      return fetchJson(`${API_BASE_URL}/mock/admin/stats`);
-    }
-    throw error;
-  }
+  return {
+    totalJobs,
+    openJobs,
+    closedJobs,
+    placementsCompleted: closedJobs,
+  };
+}
+
+export async function getManagementJobs() {
+  const params = new URLSearchParams({
+    pageNumber: "1",
+    pageSize: "50",
+    newestFirst: "true",
+  });
+
+  const jobsPayload = await fetchJson(`${API_BASE_URL}/jobs?${params.toString()}`);
+  const jobs = pickArray(jobsPayload);
+
+  const rows = await Promise.all(
+    jobs.map(async (job) => {
+      const applicationsPayload = await fetchJson(
+        `${API_BASE_URL}/applications/job/${job.jobId ?? job.JobId}?pageNumber=1&pageSize=1&newestFirst=true`
+      );
+
+      return {
+        id: job.jobId ?? job.JobId,
+        title: job.title ?? job.Title ?? "",
+        jobType: job.jobType ?? job.JobType ?? "",
+        company: job.companyName ?? job.CompanyName ?? "",
+        status: job.status ?? job.Status ?? "",
+        candidates: pickTotalCount(applicationsPayload),
+        lastUpdate: job.createdAt ?? job.CreatedAt ?? null,
+      };
+    })
+  );
+
+  return rows;
 }
