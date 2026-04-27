@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useThemeMode } from '../../theme/useThemeMode';
 import './Header.css';
 
 const navLinks = [
@@ -16,6 +17,9 @@ const navLinks = [
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { pathname } = useLocation();
+  const { mode } = useThemeMode();
+  const hireLinkLogoSrc =
+    mode === 'dark' ? '/logo-hirelink-dark.png' : '/logo-hirelink-light.png';
 
   return (
     <AppBar
@@ -29,15 +33,61 @@ function Header() {
       }}
     >
       <Toolbar className="header-toolbar">
-        <Typography
-          variant="h6"
-          component={RouterLink}
-          to="/"
-          className="header-logo"
-          sx={{ color: 'text.primary' }}
+        <Box
+          className="header-brand"
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            flexWrap: 'nowrap',
+            flexShrink: 0,
+            gap: { xs: 3, sm: 5, md: 8 },
+          }}
         >
-          השמה לסמינר
-        </Typography>
+          <Box
+            className="header-logo-figure"
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              height: { xs: 50, sm: 58, md: 64 },
+              overflow: 'hidden',
+              bgcolor: 'background.headerLogo',
+            }}
+          >
+            <Box
+              component="img"
+              src={hireLinkLogoSrc}
+              alt="HireLink"
+              sx={{
+                width: 'auto',
+                maxWidth: { xs: 'min(200px, 45vw)', sm: 220, md: 260 },
+                height: { xs: 58, sm: 68, md: 78 },
+                objectFit: 'contain',
+                objectPosition: 'center',
+                display: 'block',
+                /* Zoom past empty padding in the source PNG; keep transparent areas only. */
+                transform: 'scale(1.12)',
+                transformOrigin: 'center center',
+              }}
+            />
+          </Box>
+          <Typography
+            variant="h6"
+            component={RouterLink}
+            to="/"
+            className="header-logo"
+            sx={{
+              color: 'text.primary',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            השמה לסמינר
+          </Typography>
+        </Box>
 
         <Box className="header-nav" component="nav">
           {navLinks.map(({ label, path }) => (
