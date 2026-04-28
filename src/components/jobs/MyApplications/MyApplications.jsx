@@ -32,7 +32,7 @@ import PageShell from '../../PageShell/PageShell';
 import ApplicationStatusChip, {
   APPLICATION_STATUS_KEYS,
   APPLICATION_STATUS_META,
-} from '../../components/ApplicationStatusChip/ApplicationStatusChip';
+} from '../ApplicationStatusChip/ApplicationStatusChip';
 
 const PAGE_SIZE = 10;
 

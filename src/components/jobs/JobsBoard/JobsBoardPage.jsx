@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import PageShell from '../../PageShell/PageShell';
-import JobFilters from '../../components/JobFilters/JobFilters';
-import JobList from '../../components/JobList/JobList';
+import JobFilters from '../JobFilters/JobFilters';
+import JobList from '../JobList/JobList';
 import { useJobsSearch } from '../../../features/jobs/hooks/useJobsSearch';
 
 export default function JobsBoardPage() {

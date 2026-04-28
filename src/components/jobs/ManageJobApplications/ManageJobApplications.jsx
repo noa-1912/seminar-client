@@ -44,7 +44,7 @@ import ApplicationStatusChip, {
   APPLICATION_STATUS_META,
   applicationStatusToIndex,
   normalizeApplicationStatus,
-} from '../../components/ApplicationStatusChip/ApplicationStatusChip';
+} from '../ApplicationStatusChip/ApplicationStatusChip';
 
 const PAGE_SIZE = 10;
 

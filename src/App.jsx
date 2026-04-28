@@ -7,9 +7,10 @@ import {
   MyApplications,
   PersonalArea,
   PrivateInvitations,
-} from './features/jobs'
+} from './components/jobs'
 import About from './pages/About/About'
 import AdminDashboard from './components/admin/AdminDashboard'
+import Home from './pages/Home/Home'
 
 function PlaceholderPage({ title }) {
   return (
@@ -28,7 +29,7 @@ function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<AdminDashboard />} />
+        <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/jobs" element={<JobsBoardPage />} />
         <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />

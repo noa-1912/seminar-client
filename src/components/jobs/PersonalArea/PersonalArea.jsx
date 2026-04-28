@@ -4,8 +4,8 @@ import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurned
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 import PageShell from '../../PageShell/PageShell';
-import ApplicationsSummary from '../../components/ApplicationsSummary/ApplicationsSummary';
-import UnreadInvitationsChip from '../../components/UnreadInvitationsChip/UnreadInvitationsChip';
+import ApplicationsSummary from '../ApplicationsSummary/ApplicationsSummary';
+import UnreadInvitationsChip from '../UnreadInvitationsChip/UnreadInvitationsChip';
 
 function SectionCard({ to, title, description, icon: Icon, badge }) {
   return (
