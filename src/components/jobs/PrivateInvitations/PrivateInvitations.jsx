@@ -27,7 +27,7 @@ import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
-import PageShell from '../../../../components/PageShell/PageShell';
+import PageShell from '../../PageShell/PageShell';
 
 const PAGE_SIZE = 10;
 

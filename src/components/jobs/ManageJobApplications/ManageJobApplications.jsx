@@ -38,7 +38,7 @@ import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
-import PageShell from '../../../../components/PageShell/PageShell';
+import PageShell from '../../PageShell/PageShell';
 import ApplicationStatusChip, {
   APPLICATION_STATUS_KEYS,
   APPLICATION_STATUS_META,

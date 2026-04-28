@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
-import { fetchTags } from '../../api/jobsSearch.api';
+import { fetchTags } from '../../../api';
 
 export const FIELD_OPTIONS = [
   { value: 'Development', label: 'פיתוח' },

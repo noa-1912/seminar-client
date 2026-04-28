@@ -17,4 +17,4 @@ export { default as JobFilters }            from './components/JobFilters/JobFil
 export { default as JobList }               from './components/JobList/JobList';
 
 // Hooks
-export { useJobsSearch } from './hooks/useJobsSearch';
+export { useJobsSearch } from '../../features/jobs/hooks/useJobsSearch';

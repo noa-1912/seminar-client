@@ -28,7 +28,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
-import PageShell from '../../../../components/PageShell/PageShell';
+import PageShell from '../../PageShell/PageShell';
 import ApplicationStatusChip, {
   APPLICATION_STATUS_KEYS,
   APPLICATION_STATUS_META,

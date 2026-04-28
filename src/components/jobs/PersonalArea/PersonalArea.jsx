@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
-import PageShell from '../../../../components/PageShell/PageShell';
+import PageShell from '../../PageShell/PageShell';
 import ApplicationsSummary from '../../components/ApplicationsSummary/ApplicationsSummary';
 import UnreadInvitationsChip from '../../components/UnreadInvitationsChip/UnreadInvitationsChip';
 
