@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
   Avatar,
   Box,
   Button,
   Card,
-  Chip,
   Grid,
   List,
   ListItem,
@@ -20,8 +18,9 @@ import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import PageShell from '../../components/PageShell/PageShell';
 
 const defaultStatsPayload = {
+  totalGraduates: 12,
+  totalAccepted: 3,
   placementRate: 78,
-  acceptedThisMonth: 3,
   monthlyPlacementTrend: [
     { month: 'ינו', value: 61 },
     { month: 'פבר', value: 66 },
@@ -45,17 +44,34 @@ function normalizeStatsPayload(apiPayload) {
     return defaultStatsPayload;
   }
 
+  const normalizedMonthlyAcceptedTrend =
+    Array.isArray(apiPayload.monthlyAcceptedTrend) && apiPayload.monthlyAcceptedTrend.length > 0
+      ? apiPayload.monthlyAcceptedTrend
+      : defaultStatsPayload.monthlyAcceptedTrend;
+
+  const acceptedValues = normalizedMonthlyAcceptedTrend
+    .map((item) => Number(item?.value ?? 0))
+    .filter((value) => Number.isFinite(value));
+  const acceptedTotalFallback = acceptedValues.length > 0 ? Math.max(...acceptedValues) : 0;
+
   return {
+    totalGraduates: Number(
+      apiPayload.totalGraduates ??
+        apiPayload.totalStudentCount ??
+        defaultStatsPayload.totalGraduates,
+    ),
+    totalAccepted: Number(
+      apiPayload.totalAccepted ??
+        apiPayload.totalHiredCount ??
+        acceptedTotalFallback ??
+        defaultStatsPayload.totalAccepted,
+    ),
     placementRate: Number(apiPayload.placementRate ?? defaultStatsPayload.placementRate),
-    acceptedThisMonth: Number(apiPayload.acceptedThisMonth ?? defaultStatsPayload.acceptedThisMonth),
     monthlyPlacementTrend:
       Array.isArray(apiPayload.monthlyPlacementTrend) && apiPayload.monthlyPlacementTrend.length > 0
         ? apiPayload.monthlyPlacementTrend
         : defaultStatsPayload.monthlyPlacementTrend,
-    monthlyAcceptedTrend:
-      Array.isArray(apiPayload.monthlyAcceptedTrend) && apiPayload.monthlyAcceptedTrend.length > 0
-        ? apiPayload.monthlyAcceptedTrend
-        : defaultStatsPayload.monthlyAcceptedTrend,
+    monthlyAcceptedTrend: normalizedMonthlyAcceptedTrend,
   };
 }
 
@@ -81,9 +97,6 @@ async function fetchHomeStatsDebug() {
 export default function Home() {
   const theme = useTheme();
   const [stats, setStats] = useState(defaultStatsPayload);
-  const [statsError, setStatsError] = useState(null);
-  const [isUsingFallback, setIsUsingFallback] = useState(true);
-  const [liveDataStatusText, setLiveDataStatusText] = useState('מצב הדגמה פעיל');
 
   useEffect(() => {
     Promise.all([fetchHomeStats(), fetchHomeStatsDebug()])
@@ -93,29 +106,12 @@ export default function Home() {
           (debug?.placementLogsCount ?? 0) > 0 || (debug?.graduatesLogsCount ?? 0) > 0;
         const isRabbitConnected = Boolean(debug?.rabbitMq?.isReachable);
 
-        if (isRabbitConnected && hasRealData) {
-          setLiveDataStatusText('מחובר לנתונים חיים');
-          setIsUsingFallback(false);
-          setStatsError(null);
-          return;
+        if (!isRabbitConnected || !hasRealData) {
+          setStats(defaultStatsPayload);
         }
-
-        if (isRabbitConnected && !hasRealData) {
-          setLiveDataStatusText('מחובר לשירות, אין עדיין נתונים');
-          setIsUsingFallback(true);
-          setStatsError('השירות מחובר, אבל עדיין לא הגיעו נתונים מהמיקרוסרביס.');
-          return;
-        }
-
-        setLiveDataStatusText('מצב הדגמה פעיל');
-        setIsUsingFallback(true);
-        setStatsError('עדיין אין חיבור פעיל לנתונים חיים מהמיקרוסרביס.');
       })
       .catch(() => {
         setStats(defaultStatsPayload);
-        setLiveDataStatusText('מצב הדגמה פעיל');
-        setIsUsingFallback(true);
-        setStatsError('מוצגים נתוני הדגמה עד שהשירותים יתחברו.');
       });
   }, []);
 
@@ -127,11 +123,6 @@ export default function Home() {
     () => stats.monthlyAcceptedTrend.map((item) => item.value),
     [stats.monthlyAcceptedTrend],
   );
-  const totalGraduates = useMemo(
-    () => acceptedValues.reduce((sum, current) => sum + current, 0),
-    [acceptedValues],
-  );
-
   return (
     <PageShell>
       <Grid container spacing={6} alignItems="center">
@@ -183,7 +174,7 @@ export default function Home() {
                     מספר הבוגרות הקיים
                   </Typography>
                   <Typography variant="h3" sx={{ mt: 1, fontWeight: 700 }}>
-                    {totalGraduates}
+                    {stats.totalGraduates}
                   </Typography>
                 </Card>
               </Grid>
@@ -199,29 +190,10 @@ export default function Home() {
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    התקבלו החודש
+                    כמה התקבלו
                   </Typography>
                   <Typography variant="h3" sx={{ mt: 1, fontWeight: 700 }}>
-                    {stats.acceptedThisMonth}
-                  </Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 3,
-                    bgcolor: 'background.default',
-                    border: 1,
-                    borderColor: 'divider',
-                    boxShadow: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    סטטוס מערכת
-                  </Typography>
-                  <Typography variant="h6" sx={{ mt: 1, fontWeight: 600 }}>
-                    {liveDataStatusText}
+                    {stats.totalAccepted}
                   </Typography>
                 </Card>
               </Grid>
@@ -306,7 +278,7 @@ export default function Home() {
               series={[
                 {
                   data: acceptedValues,
-                  label: 'התקבלו החודש',
+                  label: 'התקבלו לפי חודש',
                   color: theme.palette.secondary.dark,
                 },
               ]}
@@ -352,14 +324,6 @@ export default function Home() {
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', mt: 4 }}>
-        {isUsingFallback && <Chip label="מצב הדגמה פעיל" color="warning" size="small" />}
-        {statsError && (
-          <Alert severity="warning" sx={{ maxWidth: 520 }}>
-            {statsError}
-          </Alert>
-        )}
-      </Box>
     </PageShell>
   );
 }
