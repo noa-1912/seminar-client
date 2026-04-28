@@ -11,10 +11,19 @@ import './Header.css';
 const navLinks = [
   { label: 'דף הבית', path: '/' },
   { label: 'משרות', path: '/jobs' },
+  { label: 'איזור אישי', path: '/personal-area', matchPrefixes: ['/my-applications', '/private-invitations'] },
   { label: 'פרופילים', path: '/profiles' },
   { label: 'אודות', path: '/about' },
   { label: 'צור קשר', path: '/contact' },
 ];
+
+function isLinkActive(pathname, link) {
+  if (pathname === link.path) return true;
+  if (link.matchPrefixes) {
+    return link.matchPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  }
+  return false;
+}
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -100,18 +109,21 @@ function Header() {
         </Box>
 
         <Box className="header-nav" component="nav">
-          {navLinks.map(({ label, path }) => (
-            <Button
-              key={path}
-              component={RouterLink}
-              to={path}
-              className={`header-nav-link btn ${pathname === path ? 'btn--secondary' : ''}`}
-              color="inherit"
-              variant={pathname === path ? 'outlined' : 'text'}
-            >
-              {label}
-            </Button>
-          ))}
+          {navLinks.map((link) => {
+            const active = isLinkActive(pathname, link);
+            return (
+              <Button
+                key={link.path}
+                component={RouterLink}
+                to={link.path}
+                className={`header-nav-link btn ${active ? 'btn--secondary' : ''}`}
+                color="inherit"
+                variant={active ? 'outlined' : 'text'}
+              >
+                {link.label}
+              </Button>
+            );
+          })}
         </Box>
 
         <Box className="header-actions">
@@ -141,18 +153,21 @@ function Header() {
 
       {mobileOpen && (
         <Box className="header-mobile-nav">
-          {navLinks.map(({ label, path }) => (
-            <Button
-              key={path}
-              component={RouterLink}
-              to={path}
-              onClick={() => setMobileOpen(false)}
-              fullWidth
-              className={`header-mobile-link btn ${pathname === path ? 'btn--secondary' : ''}`}
-            >
-              {label}
-            </Button>
-          ))}
+          {navLinks.map((link) => {
+            const active = isLinkActive(pathname, link);
+            return (
+              <Button
+                key={link.path}
+                component={RouterLink}
+                to={link.path}
+                onClick={() => setMobileOpen(false)}
+                fullWidth
+                className={`header-mobile-link btn ${active ? 'btn--secondary' : ''}`}
+              >
+                {link.label}
+              </Button>
+            );
+          })}
           <Button
             onClick={() => {
               toggleMode();

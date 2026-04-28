@@ -1,20 +1,33 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
+import {
+  JobsBoardPage,
+  ManageJobApplications,
+  MyApplications,
+  PersonalArea,
+  PrivateInvitations,
+} from './components/jobs'
 import Home from './pages/Home/Home'
-import Settings from './pages/Settings/Settings'
-import Jobs from './pages/Jobs/Jobs'
-import Profiles from './pages/Profiles/Profiles'
 import About from './pages/About/About'
 import Contact from './pages/Contact/Contact'
 import Login from './pages/Login/Login'
 import Signup from './pages/Signup/Signup'
+import Settings from './pages/Settings/Settings'
+import Profiles from './pages/Profiles/Profiles'
 import StudentAvailabilityPage from './pages/Scheduling/StudentAvailability/StudentAvailabilityPage.jsx'
+import AdminDashboard from './components/admin/AdminDashboard'
+
 function App() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/jobs" element={<JobsBoardPage />} />
+        <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
+        <Route path="/personal-area" element={<PersonalArea />} />
+        <Route path="/my-applications" element={<MyApplications />} />
+        <Route path="/private-invitations" element={<PrivateInvitations />} />
         <Route path="/profiles" element={<Profiles />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
