@@ -4,7 +4,8 @@ import { alpha } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 import { useThemeMode } from '../../theme/useThemeMode';
 import './Header.css';
 
@@ -28,9 +29,17 @@ function isLinkActive(pathname, link) {
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { mode, toggleMode } = useThemeMode();
+  const { isAuthenticated, user, signOut } = useAuth();
   const hireLinkLogoSrc =
     mode === 'dark' ? '/logo-hirelink-dark.png' : '/logo-hirelink-light.png';
+
+  async function handleSignOut() {
+    await signOut();
+    setMobileOpen(false);
+    navigate('/login');
+  }
 
   return (
     <AppBar
@@ -134,12 +143,30 @@ function Header() {
           >
             {mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
           </IconButton>
-          <Button component={RouterLink} to="/login" className="header-login btn btn--secondary" size="small" variant="outlined">
-            התחברות
-          </Button>
-          <Button component={RouterLink} to="/signup" className="header-signup btn btn--primary" size="small" variant="contained">
-            הרשמה
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Typography variant="body2" sx={{ display: { xs: 'none', md: 'block' } }}>
+                {`שלום, ${user?.email ?? 'משתמשת'}`}
+              </Typography>
+              <Button
+                onClick={handleSignOut}
+                className="header-login btn btn--secondary"
+                size="small"
+                variant="outlined"
+              >
+                התנתקות
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button component={RouterLink} to="/login" className="header-login btn btn--secondary" size="small" variant="outlined">
+                התחברות
+              </Button>
+              <Button component={RouterLink} to="/signup" className="header-signup btn btn--primary" size="small" variant="contained">
+                הרשמה
+              </Button>
+            </>
+          )}
         </Box>
 
         <IconButton
@@ -179,26 +206,42 @@ function Header() {
           >
             מצב תצוגה
           </Button>
-          <Button
-            component={RouterLink}
-            to="/login"
-            onClick={() => setMobileOpen(false)}
-            fullWidth
-            className="header-mobile-link btn btn--secondary"
-            variant="outlined"
-          >
-            התחברות
-          </Button>
-          <Button
-            component={RouterLink}
-            to="/signup"
-            onClick={() => setMobileOpen(false)}
-            fullWidth
-            className="header-signup header-mobile-link btn btn--primary"
-            variant="contained"
-          >
-            הרשמה
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Typography sx={{ px: 2, py: 1.5 }}>{`שלום, ${user?.email ?? 'משתמשת'}`}</Typography>
+              <Button
+                onClick={handleSignOut}
+                fullWidth
+                className="header-mobile-link btn btn--secondary"
+                variant="outlined"
+              >
+                התנתקות
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                component={RouterLink}
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                fullWidth
+                className="header-mobile-link btn btn--secondary"
+                variant="outlined"
+              >
+                התחברות
+              </Button>
+              <Button
+                component={RouterLink}
+                to="/signup"
+                onClick={() => setMobileOpen(false)}
+                fullWidth
+                className="header-signup header-mobile-link btn btn--primary"
+                variant="contained"
+              >
+                הרשמה
+              </Button>
+            </>
+          )}
         </Box>
       )}
     </AppBar>
