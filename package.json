@@ -15,6 +15,7 @@
     "@hebcal/core": "^6.3.2",
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
+    "@mui/x-charts": "^9.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1"
