@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useThemeMode } from '../../theme/useThemeMode';
 import './Header.css';
@@ -11,13 +14,12 @@ const navLinks = [
   { label: 'פרופילים', path: '/profiles' },
   { label: 'אודות', path: '/about' },
   { label: 'צור קשר', path: '/contact' },
-  { label: 'הגדרות', path: '/settings' },
 ];
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { pathname } = useLocation();
-  const { mode } = useThemeMode();
+  const { mode, toggleMode } = useThemeMode();
   const hireLinkLogoSrc =
     mode === 'dark' ? '/logo-hirelink-dark.png' : '/logo-hirelink-light.png';
 
@@ -26,10 +28,14 @@ function Header() {
       position="sticky"
       className="header-appbar"
       sx={{
-        bgcolor: 'transparent',
+        left: 0,
+        right: 0,
+        width: '100%',
+        bgcolor: (theme) => alpha(theme.palette.background.default, mode === 'dark' ? 0.82 : 0.72),
         borderBottom: '1px solid',
         borderColor: 'divider',
         backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
       }}
     >
       <Toolbar className="header-toolbar">
@@ -54,7 +60,7 @@ function Header() {
               flexShrink: 0,
               height: { xs: 50, sm: 58, md: 64 },
               overflow: 'hidden',
-              bgcolor: 'background.headerLogo',
+              bgcolor: 'transparent',
             }}
           >
             <Box
@@ -71,6 +77,10 @@ function Header() {
                 /* Zoom past empty padding in the source PNG; keep transparent areas only. */
                 transform: 'scale(1.12)',
                 transformOrigin: 'center center',
+                filter:
+                  mode === 'dark'
+                    ? 'brightness(0) saturate(100%) invert(80%) sepia(17%) saturate(248%) hue-rotate(343deg) brightness(90%) contrast(88%)'
+                    : 'none',
               }}
             />
           </Box>
@@ -105,6 +115,13 @@ function Header() {
         </Box>
 
         <Box className="header-actions">
+          <IconButton
+            onClick={toggleMode}
+            className="header-theme-toggle"
+            aria-label={mode === 'dark' ? 'מעבר למצב בהיר' : 'מעבר למצב כהה'}
+          >
+            {mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+          </IconButton>
           <Button component={RouterLink} to="/login" className="header-login btn btn--secondary" size="small" variant="outlined">
             התחברות
           </Button>
@@ -136,6 +153,17 @@ function Header() {
               {label}
             </Button>
           ))}
+          <Button
+            onClick={() => {
+              toggleMode();
+              setMobileOpen(false);
+            }}
+            fullWidth
+            className="header-mobile-link btn btn--secondary"
+            variant="outlined"
+          >
+            מצב תצוגה
+          </Button>
           <Button
             component={RouterLink}
             to="/login"
