@@ -1,5 +1,5 @@
 /**
- * Create job form (manager). POSTs CreateJobDto-shaped payload to POST /api/jobs.
+ * Edit job form (manager). PUTs UpdateJobDto-shaped payload to PUT /api/jobs/:id.
  */
 import { useEffect, useState } from "react";
 import {
@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   Grid,
@@ -16,37 +17,53 @@ import {
   Select,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
-import { createJob, getAllTags } from "./adminService";
 import JobImageField from "./JobImageField";
-import { FIELD_OPTIONS, JOB_TYPE_OPTIONS } from "./jobFormConstants";
+import {
+  FIELD_OPTIONS,
+  JOB_TYPE_OPTIONS,
+  fieldFromApi,
+  jobTypeFromApi,
+} from "./jobFormConstants";
+import {
+  getAllTags,
+  getJobById,
+  jobStatusStringToApiValue,
+  updateJob,
+} from "./adminService";
 
-const initial = {
-  title: "",
-  description: "",
-  companyName: "",
-  location: "",
-  requirements: "",
-  experience: 0,
-  jobType: 0,
-  field: 0,
-  isRemote: false,
-  isPrivate: false,
-  salaryMin: "",
-  salaryMax: "",
-  jobWebsiteUrl: "",
-  jobImageUrl: "",
-  deadline: "",
-  tagIds: [],
-};
+function toDateInputValue(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function resolveTagIdsFromJob(job, allTags) {
+  if (!job?.tags?.length || !allTags?.length) return [];
+  const names = new Set(job.tags.map((t) => String(t).toLowerCase()));
+  return allTags
+    .filter((t) => names.has(String(t.tagName ?? t.TagName).toLowerCase()))
+    .map((t) => t.tagId ?? t.TagId);
+}
+
+const STATUS_OPTIONS = [
+  { value: 0, label: "פתוח" },
+  { value: 1, label: "סגור" },
+  { value: 2, label: "ממתין" },
+];
 
 function validate(v) {
   const errors = {};
-  if (!String(v.title).trim()) errors.title = "שדה חובה";
-  if (!String(v.description).trim()) errors.description = "שדה חובה";
-  if (!String(v.companyName).trim()) errors.companyName = "שדה חובה";
-  if (!String(v.location).trim()) errors.location = "שדה חובה";
-  if (!String(v.requirements).trim()) errors.requirements = "שדה חובה";
+  if (!String(v.title ?? "").trim()) errors.title = "שדה חובה";
+  if (!String(v.description ?? "").trim()) errors.description = "שדה חובה";
+  if (!String(v.companyName ?? "").trim()) errors.companyName = "שדה חובה";
+  if (!String(v.location ?? "").trim()) errors.location = "שדה חובה";
+  if (!String(v.requirements ?? "").trim()) errors.requirements = "שדה חובה";
   const exp = Number(v.experience);
   if (Number.isNaN(exp) || exp < 0) errors.experience = "הזיני מספר 0 או חיובי";
   if (!v.deadline) errors.deadline = "נא לבחור מועד";
@@ -63,7 +80,7 @@ function validate(v) {
   return errors;
 }
 
-function buildCreatePayload(v) {
+function buildUpdatePayload(v) {
   const salaryMin = v.salaryMin === "" ? null : Math.floor(Number(v.salaryMin));
   const salaryMax = v.salaryMax === "" ? null : Math.floor(Number(v.salaryMax));
   return {
@@ -81,54 +98,127 @@ function buildCreatePayload(v) {
     salaryMax,
     jobWebsiteUrl: v.jobWebsiteUrl?.trim() || null,
     jobImageUrl: v.jobImageUrl?.trim() || null,
-    deadline: new Date(`${v.deadline}T12:00:00`).toISOString(),
+    status: Number(v.status),
+    deadline: v.deadline ? new Date(`${v.deadline}T12:00:00`).toISOString() : null,
     tagIds: Array.isArray(v.tagIds) ? v.tagIds : [],
   };
 }
 
-export default function CreateJobForm({ onSuccess }) {
-  const [form, setForm] = useState(initial);
+export default function EditJobForm({ open, jobId, onSuccess, onCancel }) {
   const [tags, setTags] = useState([]);
+  const [values, setValues] = useState(null);
   const [errors, setErrors] = useState({});
+  const [loadError, setLoadError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    let c = true;
-    getAllTags()
-      .then((t) => c && setTags(t))
-      .catch(() => {});
-    return () => {
-      c = false;
-    };
-  }, []);
+    if (!open || !jobId) {
+      return;
+    }
 
-  const set = (name, value) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
+    let cancelled = false;
+
+    async function load() {
+      setIsLoading(true);
+      setLoadError("");
+      setSubmitError("");
+      setValues(null);
+      setErrors({});
+
+      try {
+        const [job, allTags] = await Promise.all([getJobById(jobId), getAllTags()]);
+        if (cancelled) return;
+
+        setTags(allTags);
+        const sm = job.salaryMin ?? job.SalaryMin;
+        const sx = job.salaryMax ?? job.SalaryMax;
+
+        setValues({
+          title: job.title ?? job.Title ?? "",
+          description: job.description ?? job.Description ?? "",
+          companyName: job.companyName ?? job.CompanyName ?? "",
+          location: job.location ?? job.Location ?? "",
+          requirements: job.requirements ?? job.Requirements ?? "",
+          experience: job.experience ?? job.Experience ?? 0,
+          jobType: jobTypeFromApi(job.jobType ?? job.JobType),
+          field: fieldFromApi(job.field ?? job.Field),
+          isRemote: Boolean(job.isRemote ?? job.IsRemote),
+          isPrivate: Boolean(job.isPrivate ?? job.IsPrivate),
+          salaryMin: sm != null ? String(sm) : "",
+          salaryMax: sx != null ? String(sx) : "",
+          jobWebsiteUrl: job.jobWebsiteUrl ?? job.JobWebsiteUrl ?? "",
+          jobImageUrl: job.jobImageUrl ?? job.JobImageUrl ?? "",
+          status: jobStatusStringToApiValue(job.status ?? job.Status),
+          deadline: toDateInputValue(job.deadline ?? job.Deadline),
+          tagIds: resolveTagIdsFromJob({ tags: job.tags ?? job.Tags }, allTags),
+        });
+      } catch (e) {
+        if (!cancelled) {
+          setLoadError(e?.message || "טעינת המשרה נכשלה.");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, jobId]);
+
+  const set = (name, val) => {
+    setValues((prev) => ({ ...prev, [name]: val }));
     if (errors[name]) setErrors((e) => ({ ...e, [name]: "" }));
   };
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
-    const next = validate(form);
+    const next = validate(values);
     setErrors(next);
     if (Object.keys(next).length) return;
 
     try {
       setIsSubmitting(true);
-      await createJob(buildCreatePayload(form));
-      setForm(initial);
+      await updateJob(jobId, buildUpdatePayload(values));
       onSuccess?.();
     } catch (err) {
-      setSubmitError(err?.message || "לא ניתן ליצור משרה כרגע.");
+      setSubmitError(err?.message || "השמירה נכשלה.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (!open) {
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <Stack alignItems="center" py={3}>
+        <CircularProgress size={28} />
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          טוען…
+        </Typography>
+      </Stack>
+    );
+  }
+
+  if (loadError) {
+    return <Alert severity="error">{loadError}</Alert>;
+  }
+
+  if (!values) {
+    return null;
+  }
+
   return (
-    <Box component="form" onSubmit={onSubmit} sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 0.5 }}>
       <Stack spacing={2}>
         {submitError ? <Alert severity="error">{submitError}</Alert> : null}
 
@@ -138,7 +228,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               required
               label="שם המשרה"
-              value={form.title}
+              value={values.title}
               onChange={(e) => set("title", e.target.value)}
               error={Boolean(errors.title)}
               helperText={errors.title || " "}
@@ -149,7 +239,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               required
               label="שם המעסיק / חברה"
-              value={form.companyName}
+              value={values.companyName}
               onChange={(e) => set("companyName", e.target.value)}
               error={Boolean(errors.companyName)}
               helperText={errors.companyName || " "}
@@ -160,7 +250,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               required
               label="תיאור"
-              value={form.description}
+              value={values.description}
               onChange={(e) => set("description", e.target.value)}
               multiline
               rows={4}
@@ -173,7 +263,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               required
               label="מיקום"
-              value={form.location}
+              value={values.location}
               onChange={(e) => set("location", e.target.value)}
               error={Boolean(errors.location)}
               helperText={errors.location || " "}
@@ -184,7 +274,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               required
               label="דרישות"
-              value={form.requirements}
+              value={values.requirements}
               onChange={(e) => set("requirements", e.target.value)}
               error={Boolean(errors.requirements)}
               helperText={errors.requirements || " "}
@@ -195,7 +285,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               type="number"
               label="שנות ניסיון"
-              value={form.experience}
+              value={values.experience}
               onChange={(e) => set("experience", e.target.value)}
               inputProps={{ min: 0 }}
               error={Boolean(errors.experience)}
@@ -207,7 +297,7 @@ export default function CreateJobForm({ onSuccess }) {
               select
               fullWidth
               label="סוג משרה"
-              value={form.jobType}
+              value={values.jobType}
               onChange={(e) => set("jobType", Number(e.target.value))}
             >
               {JOB_TYPE_OPTIONS.map((o) => (
@@ -222,7 +312,7 @@ export default function CreateJobForm({ onSuccess }) {
               select
               fullWidth
               label="תחום"
-              value={form.field}
+              value={values.field}
               onChange={(e) => set("field", Number(e.target.value))}
             >
               {FIELD_OPTIONS.map((o) => (
@@ -237,7 +327,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               type="number"
               label="שכר מינ׳ (אופציונלי)"
-              value={form.salaryMin}
+              value={values.salaryMin}
               onChange={(e) => set("salaryMin", e.target.value)}
               error={Boolean(errors.salaryMin)}
               helperText={errors.salaryMin || " "}
@@ -248,7 +338,7 @@ export default function CreateJobForm({ onSuccess }) {
               fullWidth
               type="number"
               label="שכר מקס׳ (אופציונלי)"
-              value={form.salaryMax}
+              value={values.salaryMax}
               onChange={(e) => set("salaryMax", e.target.value)}
               error={Boolean(errors.salaryMax)}
               helperText={errors.salaryMax || " "}
@@ -260,7 +350,7 @@ export default function CreateJobForm({ onSuccess }) {
               type="date"
               required
               label="מועד אחרון להגשה"
-              value={form.deadline}
+              value={values.deadline}
               onChange={(e) => set("deadline", e.target.value)}
               InputLabelProps={{ shrink: true }}
               error={Boolean(errors.deadline)}
@@ -271,7 +361,7 @@ export default function CreateJobForm({ onSuccess }) {
             <TextField
               fullWidth
               label="אתר משרה (URL)"
-              value={form.jobWebsiteUrl}
+              value={values.jobWebsiteUrl}
               onChange={(e) => set("jobWebsiteUrl", e.target.value)}
               error={Boolean(errors.jobWebsiteUrl)}
               helperText={errors.jobWebsiteUrl || " "}
@@ -279,17 +369,32 @@ export default function CreateJobForm({ onSuccess }) {
           </Grid>
           <Grid size={12}>
             <JobImageField
-              value={form.jobImageUrl}
+              value={values.jobImageUrl}
               onChange={(url) => set("jobImageUrl", url)}
               disabled={isSubmitting}
             />
           </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              select
+              fullWidth
+              label="סטטוס"
+              value={values.status}
+              onChange={(e) => set("status", Number(e.target.value))}
+            >
+              {STATUS_OPTIONS.map((o) => (
+                <MenuItem key={o.value} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
           <Grid size={12}>
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={form.isRemote}
+                    checked={values.isRemote}
                     onChange={(e) => set("isRemote", e.target.checked)}
                   />
                 }
@@ -298,7 +403,7 @@ export default function CreateJobForm({ onSuccess }) {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={form.isPrivate}
+                    checked={values.isPrivate}
                     onChange={(e) => set("isPrivate", e.target.checked)}
                   />
                 }
@@ -308,18 +413,19 @@ export default function CreateJobForm({ onSuccess }) {
           </Grid>
           <Grid size={12}>
             <FormControl fullWidth>
-              <InputLabel id="create-tags-label">תגיות</InputLabel>
+              <InputLabel id="edit-job-tags-label">תגיות</InputLabel>
               <Select
-                labelId="create-tags-label"
+                labelId="edit-job-tags-label"
                 multiple
-                value={form.tagIds}
+                value={values.tagIds}
                 onChange={(e) =>
                   set("tagIds", typeof e.target.value === "string" ? [] : e.target.value)
                 }
                 input={<OutlinedInput label="תגיות" />}
                 renderValue={(selected) => {
-                  if (!selected.length) return "—";
-                  return selected
+                  const s = selected || [];
+                  if (!s.length) return "—";
+                  return s
                     .map((id) => tags.find((t) => (t.tagId ?? t.TagId) === id))
                     .filter(Boolean)
                     .map((t) => t.tagName ?? t.TagName)
@@ -328,9 +434,10 @@ export default function CreateJobForm({ onSuccess }) {
               >
                 {tags.map((t) => {
                   const id = t.tagId ?? t.TagId;
+                  const name = t.tagName ?? t.TagName;
                   return (
                     <MenuItem key={id} value={id}>
-                      {t.tagName ?? t.TagName}
+                      {name}
                     </MenuItem>
                   );
                 })}
@@ -344,7 +451,8 @@ export default function CreateJobForm({ onSuccess }) {
             type="button"
             variant="outlined"
             className="btn btn--secondary"
-            onClick={() => onSuccess?.()}
+            onClick={onCancel}
+            disabled={isSubmitting}
           >
             ביטול
           </Button>
@@ -354,7 +462,7 @@ export default function CreateJobForm({ onSuccess }) {
             className="btn btn--primary"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "יוצר…" : "יצירת משרה"}
+            {isSubmitting ? "שומר…" : "שמירה"}
           </Button>
         </Stack>
       </Stack>

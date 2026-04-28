@@ -1,3 +1,6 @@
+/**
+ * Employer admin dashboard: stats, management table, create-job dialog.
+ */
 import { useEffect, useMemo, useState } from "react";
 import {
   Alert,

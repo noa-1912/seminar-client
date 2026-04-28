@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5243/api";
+// In Vite dev, `/api` is proxied to the backend (same origin; fewer CORS issues).
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "/api" : "http://localhost:5243/api");
 let devManagerTokenPromise = null;
 
 function getAuthToken() {
@@ -44,6 +47,44 @@ async function ensureDevManagerToken() {
   }
 
   await devManagerTokenPromise;
+}
+
+async function fetchMultipartJson(url, formData) {
+  await ensureDevManagerToken();
+
+  const authHeaders = () => {
+    const token = getAuthToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  let response = await fetch(url, {
+    method: "POST",
+    headers: authHeaders(),
+    body: formData,
+  });
+
+  if (import.meta.env.DEV && (response.status === 401 || response.status === 403)) {
+    window.localStorage.removeItem("authToken");
+    window.localStorage.removeItem("token");
+    await ensureDevManagerToken();
+    response = await fetch(url, {
+      method: "POST",
+      headers: authHeaders(),
+      body: formData,
+    });
+  }
+
+  if (!response.ok) {
+    let detail = "";
+    try {
+      detail = await response.text();
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail.trim() || `העלאה נכשלה (${response.status})`);
+  }
+
+  return response.json();
 }
 
 async function fetchJson(url, options = {}) {
@@ -130,6 +171,45 @@ export async function getAdminDashboardStats() {
     closedJobs,
     placementsCompleted: closedJobs,
   };
+}
+
+/** API expects JobStatus as numeric enum: Open=0, Closed=1, Pending=2 */
+export const JOB_STATUS_API = {
+  Open: 0,
+  Closed: 1,
+  Pending: 2,
+};
+
+export function jobStatusStringToApiValue(status) {
+  return JOB_STATUS_API[status] ?? 0;
+}
+
+export async function getJobById(jobId) {
+  return fetchJson(`${API_BASE_URL}/jobs/${jobId}`);
+}
+
+export async function getAllTags() {
+  const data = await fetchJson(`${API_BASE_URL}/tags`);
+  return Array.isArray(data) ? data : pickArray(data);
+}
+
+export async function updateJob(jobId, payload) {
+  return fetchJson(`${API_BASE_URL}/jobs/${jobId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+/** Upload job listing image: POST multipart to /api/files/job-image (manager). Returns URL for jobImageUrl. */
+export async function uploadJobImage(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const data = await fetchMultipartJson(`${API_BASE_URL}/files/job-image`, formData);
+  const url = data?.url ?? data?.Url;
+  if (!url) {
+    throw new Error("תשובת השרת לא כוללת כתובת תמונה.");
+  }
+  return { url };
 }
 
 export async function getManagementJobs() {

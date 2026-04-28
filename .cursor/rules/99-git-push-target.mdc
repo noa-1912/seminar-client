@@ -14,3 +14,4 @@ alwaysApply: true
 - Create and push client-related commits to `feature/jobs`.
 - Do not push client commits to `main` unless explicitly requested.
 - If push is rejected (non-fast-forward), rebase on `origin/feature/jobs` and push again without force.
+- Opening a pull request does not require a different push target or extra push steps: publish by pushing to `origin feature/jobs` when ready, then open the PR from that branch on the host.
