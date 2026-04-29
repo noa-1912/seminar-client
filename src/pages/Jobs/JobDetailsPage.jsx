@@ -64,7 +64,7 @@ export default function JobDetailsPage() {
   const { jobId } = useParams();
   const [job, setJob] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
- // const [isNotFound, setIsNotFound] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [countdownText, setCountdownText] = useState('');

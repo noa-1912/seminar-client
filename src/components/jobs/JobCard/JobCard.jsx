@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -13,6 +14,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import LaptopOutlinedIcon from '@mui/icons-material/LaptopOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Displays a single job listing card.
@@ -25,7 +27,15 @@ import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
  *   onClick (job) => void   – optional
  */
 export default function JobCard({ job, onClick }) {
+  const navigate = useNavigate();
   const companyInitial = (job.companyName || '?').trim().charAt(0).toUpperCase();
+  const canNavigateToDetails = job.jobId !== undefined && job.jobId !== null && job.jobId !== '';
+
+  const handleOpenDetails = (event) => {
+    event?.stopPropagation?.();
+    if (!canNavigateToDetails) return;
+    navigate(`/jobs/${job.jobId}`);
+  };
 
   const content = (
     <CardContent sx={{ p: { xs: 2, md: 2.5 }, '&:last-child': { pb: { xs: 2, md: 2.5 } } }}>
@@ -130,6 +140,12 @@ export default function JobCard({ job, onClick }) {
               </Stack>
             </Box>
           )}
+
+          <Box sx={{ pt: 1 }}>
+            <Button variant="outlined" size="small" onClick={handleOpenDetails} disabled={!canNavigateToDetails}>
+              לפרטי המשרה
+            </Button>
+          </Box>
         </Stack>
       </Stack>
     </CardContent>
