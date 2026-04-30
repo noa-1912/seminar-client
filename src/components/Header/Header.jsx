@@ -13,6 +13,7 @@ const navLinks = [
   { label: 'דף הבית', path: '/' },
   { label: 'משרות', path: '/jobs' },
   { label: 'איזור אישי', path: '/personal-area', matchPrefixes: ['/my-applications', '/private-invitations'] },
+  { label: 'הריאיונות שלי', path: '/my-interviews' },
   { label: 'פרופילים', path: '/profiles' },
   { label: 'אודות', path: '/about' },
   { label: 'צור קשר', path: '/contact' },
