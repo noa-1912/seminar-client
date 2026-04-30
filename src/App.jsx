@@ -17,6 +17,7 @@ import Settings from './pages/Settings/Settings'
 import Profiles from './pages/Profiles/Profiles'
 import StudentAvailabilityPage from './pages/Scheduling/StudentAvailability/StudentAvailabilityPage.jsx'
 import CreateInterviewSlots from './components/Scheduling/CreateInterviewSlots'
+import ScheduledInterviews from './pages/ScheduledInterviews/ScheduledInterviews'
 import AdminDashboard from './components/admin/AdminDashboard'
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/student-availability" element={<StudentAvailabilityPage />} />
+        <Route path="/my-interviews" element={<ScheduledInterviews />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

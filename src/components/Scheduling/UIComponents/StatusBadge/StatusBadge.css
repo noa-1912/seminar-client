@@ -1,0 +1,69 @@
+/* StatusBadge Component Styles */
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-badge .MuiChip-root {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.status-badge .MuiChip-filled {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.status-badge .MuiChip-filled:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.status-badge .MuiChip-outlined {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-width: 2px;
+}
+
+.status-badge .MuiChip-outlined:hover {
+  background-color: rgba(25, 118, 210, 0.05);
+  transform: translateY(-2px);
+}
+
+.status-badge .MuiChip-colorPrimary {
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+.status-badge .MuiChip-colorSuccess {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+}
+
+.status-badge .MuiChip-colorError {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+}
+
+.status-badge .MuiChip-colorWarning {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.status-badge .MuiChip-colorInfo {
+  background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+}
+
+/* Icon styling */
+.status-badge .MuiChip-icon {
+  color: inherit !important;
+}
+
+/* Responsive sizing */
+@media (max-width: 600px) {
+  .status-badge .MuiChip-root {
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .status-badge .MuiChip-icon {
+    font-size: 18px !important;
+  }
+}
