@@ -8,6 +8,7 @@ import {
   PrivateInvitations,
 } from './components/jobs'
 import Home from './pages/Home/Home'
+import JobDetailsPage from './pages/Jobs/JobDetailsPage'
 import About from './pages/About/About'
 import Contact from './pages/Contact/Contact'
 import Login from './pages/Login/Login'
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/jobs" element={<JobsBoardPage />} />
+        <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
         <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
         <Route path="/jobs/:jobId/interview-slots/new" element={<CreateInterviewSlots />} />
         <Route path="/personal-area" element={<PersonalArea />} />
