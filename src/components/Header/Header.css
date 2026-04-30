@@ -1,6 +1,5 @@
 .header-appbar {
-  background: transparent !important;
-  border-bottom: none;
+  border-bottom: 1px solid transparent;
 }
 
 .header-toolbar {
@@ -29,6 +28,10 @@
   color: var(--color-text-primary) !important;
   min-width: auto;
   padding: var(--space-2) var(--space-3);
+}
+
+.header-theme-toggle {
+  color: var(--color-text-primary) !important;
 }
 
 .header-actions {
