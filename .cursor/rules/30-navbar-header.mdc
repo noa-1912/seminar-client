@@ -1,6 +1,6 @@
 ---
 description: Navbar/Header must match MUI spec structure
-globs: src/components/Header/**/*.{js,jsx,css}
+globs: src/components/team1/Header/**/*.{js,jsx,css}
 alwaysApply: false
 ---
 

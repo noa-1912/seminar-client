@@ -1,6 +1,6 @@
 ---
 description: Home dashboard section requirements
-globs: src/pages/Home/**/*.{js,jsx}
+globs: src/components/team1/marketing/Home/**/*.{js,jsx}
 alwaysApply: false
 ---
 
