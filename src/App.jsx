@@ -15,6 +15,7 @@ import Signup from './pages/Signup/Signup'
 import Settings from './pages/Settings/Settings'
 import Profiles from './pages/Profiles/Profiles'
 import StudentAvailabilityPage from './pages/Scheduling/StudentAvailability/StudentAvailabilityPage.jsx'
+import CreateInterviewSlots from './components/Scheduling/CreateInterviewSlots'
 import AdminDashboard from './components/admin/AdminDashboard'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/jobs" element={<JobsBoardPage />} />
         <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
+        <Route path="/jobs/:jobId/interview-slots/new" element={<CreateInterviewSlots />} />
         <Route path="/personal-area" element={<PersonalArea />} />
         <Route path="/my-applications" element={<MyApplications />} />
         <Route path="/private-invitations" element={<PrivateInvitations />} />
