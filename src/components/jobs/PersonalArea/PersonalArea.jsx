@@ -6,6 +6,8 @@ import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutl
 import PageShell from '../../PageShell/PageShell';
 import ApplicationsSummary from '../ApplicationsSummary/ApplicationsSummary';
 import UnreadInvitationsChip from '../UnreadInvitationsChip/UnreadInvitationsChip';
+import AdminDashboard from '../../admin/AdminDashboard';
+import { useAuth } from '../../../auth/AuthContext';
 
 function SectionCard({ to, title, description, icon: Icon, badge }) {
   return (
@@ -56,7 +58,38 @@ function SectionCard({ to, title, description, icon: Icon, badge }) {
   );
 }
 
-export default function PersonalArea() {
+function extractRoleFromJwt(token) {
+  if (!token) return '';
+  try {
+    const payloadPart = token.split('.')[1];
+    if (!payloadPart) return '';
+    const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+    const json = JSON.parse(atob(normalized));
+
+    return (
+      json?.role ||
+      json?.roles?.[0] ||
+      json?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      ''
+    );
+  } catch {
+    return '';
+  }
+}
+
+function resolveCurrentUserRole(user) {
+  const directRole = user?.role || user?.Role || user?.roles?.[0] || user?.Roles?.[0];
+  if (directRole) return String(directRole);
+
+  const token =
+    (typeof window !== 'undefined' && window.localStorage.getItem('authToken')) ||
+    (typeof window !== 'undefined' && window.localStorage.getItem('token')) ||
+    '';
+
+  return extractRoleFromJwt(token);
+}
+
+function StudentPersonalArea() {
   return (
     <PageShell>
       <Stack spacing={4}>
@@ -104,4 +137,16 @@ export default function PersonalArea() {
       </Stack>
     </PageShell>
   );
+}
+
+export default function PersonalArea() {
+  const { user } = useAuth();
+  const role = resolveCurrentUserRole(user).toLowerCase();
+  const isManager = role === 'manager' || role === 'admin' || role === 'employer';
+
+  if (isManager) {
+    return <AdminDashboard />;
+  }
+
+  return <StudentPersonalArea />;
 }

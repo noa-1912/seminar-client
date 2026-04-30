@@ -1,5 +1,21 @@
 /**
- * Employer admin dashboard: stats, management table, create-job dialog.
+ * AdminDashboard
+ * --------------
+ * Top-level manager workspace for jobs and applications.
+ *
+ * Composition:
+ * - Hero section (title, subtitle, primary create action).
+ * - KPI statistics cards.
+ * - Tabbed content:
+ *   - Job management table.
+ *   - Applications overview panel.
+ * - Create-job dialog with full form.
+ *
+ * Data:
+ * - Uses `getAdminDashboardStats()` for lightweight KPI cards.
+ *
+ * UX goal:
+ * - Keep frequently-used manager actions available from a single entry point.
  */
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -14,6 +30,8 @@ import {
   DialogTitle,
   Grid,
   Stack,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -23,6 +41,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import CreateJobForm from "./CreateJobForm";
 import ManagementTable from "./ManagementTable";
+import AdminApplicationsPanel from "./AdminApplicationsPanel";
 import { getAdminDashboardStats } from "./adminService";
 import "./jobsAdmin.css";
 import "../../theme/Theme.css";
@@ -56,6 +75,7 @@ function StatCard({ icon, label, value }) {
 
 export default function AdminDashboard() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const [stats, setStats] = useState(defaultStats);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState("");
@@ -122,6 +142,7 @@ export default function AdminDashboard() {
   return (
     <Box className="jobs-admin">
       <Stack
+        className="jobs-admin__hero"
         direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
         spacing={2}
@@ -165,7 +186,23 @@ export default function AdminDashboard() {
         ))}
       </Grid>
 
-      <ManagementTable />
+      <Box sx={{ mt: 3 }}>
+        <Tabs
+          className="jobs-admin__tabs"
+          value={activeTab}
+          onChange={(_event, nextValue) => setActiveTab(nextValue)}
+          aria-label="admin management tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab label="ניהול משרות" />
+          <Tab label="ניהול מועמדויות" />
+        </Tabs>
+      </Box>
+
+      <Box sx={{ mt: 2 }}>
+        {activeTab === 0 ? <ManagementTable /> : <AdminApplicationsPanel />}
+      </Box>
 
       <Dialog
         fullWidth
@@ -173,7 +210,7 @@ export default function AdminDashboard() {
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
       >
-        <DialogTitle>יצירת מודעת דרושים חדשה</DialogTitle>
+        <DialogTitle className="jobs-admin__dialog-title">יצירת מודעת דרושים חדשה</DialogTitle>
         <DialogContent>
           <CreateJobForm onSuccess={() => setIsCreateOpen(false)} />
         </DialogContent>

@@ -1,8 +1,30 @@
+/*
+ * jobsAdmin.css
+ * -------------
+ * Shared visual language for the admin workspace.
+ *
+ * Includes:
+ * - Dashboard shell and hero styling.
+ * - KPI/stat card presentation.
+ * - Management table and tabs treatment.
+ * - Action button sizing rules to reduce UI layout shift.
+ *
+ * Design principles:
+ * - Use theme tokens (spacing, radii, colors, shadows).
+ * - Keep components compact, consistent, and readable.
+ */
 .jobs-admin {
   padding: var(--space-6);
   border-radius: var(--radius-lg);
   background: var(--color-bg-page);
   color: var(--color-text-primary);
+}
+
+.jobs-admin__hero {
+  padding: 18px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-brand-primary) 4%, transparent), transparent);
 }
 
 .jobs-admin__title {
@@ -20,6 +42,13 @@
   border-radius: var(--radius-md);
   background-color: var(--color-bg-surface);
   box-shadow: var(--shadow-sm);
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.jobs-admin__stat-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 30%, var(--color-border-soft));
+  box-shadow: var(--shadow-md);
 }
 
 .jobs-admin__stat-icon {
@@ -58,4 +87,53 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow-x: auto;
+}
+
+.jobs-admin__tabs {
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.jobs-admin__tabs .MuiTab-root {
+  text-transform: none;
+  font-weight: 600;
+}
+
+.jobs-admin__tabs .MuiTabs-indicator {
+  height: 3px;
+  border-radius: 99px;
+}
+
+.jobs-admin__search-bar {
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+}
+
+.jobs-admin__table thead th {
+  background: color-mix(in srgb, var(--color-bg-muted) 55%, transparent);
+  font-weight: 700;
+}
+
+.jobs-admin__table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.jobs-admin__table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-bg-muted) 35%, transparent);
+}
+
+.jobs-admin__action-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.jobs-admin__panel-card {
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.jobs-admin__dialog-title {
+  font-weight: 700;
+  border-bottom: 1px solid var(--color-border-soft);
 }

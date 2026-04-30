@@ -1,11 +1,23 @@
 /**
- * Edit job form (manager). PUTs UpdateJobDto-shaped payload to PUT /api/jobs/:id.
+ * EditJobForm
+ * -----------
+ * Manager-facing edit form for existing jobs.
+ *
+ * Features:
+ * - Loads current job + tags in parallel.
+ * - Normalizes API enums and legacy casing variants.
+ * - Validates user input before submission.
+ * - Sends full UpdateJobDto payload to preserve server contract.
+ *
+ * Usage:
+ * - Rendered inside a modal dialog by `ManagementTable`.
  */
 import { useEffect, useState } from "react";
 import {
   Alert,
   Box,
   Button,
+  Chip,
   Checkbox,
   CircularProgress,
   FormControl,
@@ -43,6 +55,7 @@ function toDateInputValue(iso) {
   return `${y}-${m}-${day}`;
 }
 
+/** Resolves numeric tag IDs from tag names included in the loaded job object. */
 function resolveTagIdsFromJob(job, allTags) {
   if (!job?.tags?.length || !allTags?.length) return [];
   const names = new Set(job.tags.map((t) => String(t).toLowerCase()));
@@ -80,6 +93,7 @@ function validate(v) {
   return errors;
 }
 
+/** Converts local edit state into an UpdateJobDto-compatible payload. */
 function buildUpdatePayload(v) {
   const salaryMin = v.salaryMin === "" ? null : Math.floor(Number(v.salaryMin));
   const salaryMax = v.salaryMax === "" ? null : Math.floor(Number(v.salaryMax));
@@ -425,11 +439,22 @@ export default function EditJobForm({ open, jobId, onSuccess, onCancel }) {
                 renderValue={(selected) => {
                   const s = selected || [];
                   if (!s.length) return "—";
-                  return s
-                    .map((id) => tags.find((t) => (t.tagId ?? t.TagId) === id))
-                    .filter(Boolean)
-                    .map((t) => t.tagName ?? t.TagName)
-                    .join(", ");
+                  return (
+                    <Box sx={{ display: "flex", gap: 0.75, flexWrap: "wrap" }}>
+                      {s
+                        .map((id) => tags.find((t) => (t.tagId ?? t.TagId) === id))
+                        .filter(Boolean)
+                        .map((t) => (
+                          <Chip
+                            key={t.tagId ?? t.TagId}
+                            size="small"
+                            label={t.tagName ?? t.TagName}
+                            color="secondary"
+                            variant="outlined"
+                          />
+                        ))}
+                    </Box>
+                  );
                 }}
               >
                 {tags.map((t) => {
@@ -437,7 +462,7 @@ export default function EditJobForm({ open, jobId, onSuccess, onCancel }) {
                   const name = t.tagName ?? t.TagName;
                   return (
                     <MenuItem key={id} value={id}>
-                      {name}
+                      <Chip size="small" label={name} color="secondary" variant="outlined" />
                     </MenuItem>
                   );
                 })}

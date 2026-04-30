@@ -9,6 +9,10 @@ import {
   CardContent,
   CircularProgress,
   Divider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
   Link as MuiLink,
@@ -38,6 +42,8 @@ import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import PageShell from '../../PageShell/PageShell';
 import ApplicationStatusChip, {
   APPLICATION_STATUS_KEYS,
@@ -49,7 +55,10 @@ import ApplicationStatusChip, {
 const PAGE_SIZE = 10;
 
 function getAuthHeader() {
-  const token = typeof window !== 'undefined' ? window.localStorage.getItem('token') : null;
+  const token =
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem('token') || window.localStorage.getItem('authToken')
+      : null;
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -135,6 +144,7 @@ export default function ManageJobApplications() {
   const [statuses, setStatuses] = useState([]);
   const [newestFirst, setNewestFirst] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
+  const [selectedApplicationId, setSelectedApplicationId] = useState(null);
 
   const { drafts, initDraft, updateDraft, markSaved } = useApplicationDrafts();
 
@@ -259,6 +269,30 @@ export default function ManageJobApplications() {
     }
   };
 
+  const selectedItem =
+    selectedApplicationId == null
+      ? null
+      : items.find((item) => item.applicationId === selectedApplicationId) ?? null;
+
+  const selectedDraft = selectedItem ? drafts[selectedItem.applicationId] : null;
+  const selectedStatus = selectedDraft?.status ?? normalizeApplicationStatus(selectedItem?.status);
+  const selectedNotes = selectedDraft?.notes ?? selectedItem?.notes ?? '';
+  const selectedDirty =
+    selectedDraft &&
+    (selectedDraft.status !== selectedDraft.savedStatus ||
+      (selectedDraft.notes ?? '') !== (selectedDraft.savedNotes ?? ''));
+
+  const updateStatusDraft = (applicationId, status) => {
+    updateDraft(applicationId, { status });
+  };
+
+  const STATUS_ACTIONS = [
+    { key: 'Rejected', label: 'נדחה', color: 'error' },
+    { key: 'Accepted', label: 'התקבל', color: 'success' },
+    { key: 'Interviewed', label: 'ראיון', color: 'info' },
+    { key: 'Pending', label: 'ממתין', color: 'warning' },
+  ];
+
   const hasFilters = statuses.length > 0 || !newestFirst;
 
   const headerSummary = useMemo(() => {
@@ -267,9 +301,18 @@ export default function ManageJobApplications() {
     return `נמצאו ${totalCount} מועמדויות`;
   }, [loading, totalCount]);
 
+  const statusCounts = useMemo(() => {
+    const counts = APPLICATION_STATUS_KEYS.reduce((acc, key) => ({ ...acc, [key]: 0 }), {});
+    items.forEach((item) => {
+      const key = normalizeApplicationStatus(item.status);
+      counts[key] = (counts[key] ?? 0) + 1;
+    });
+    return counts;
+  }, [items]);
+
   return (
     <PageShell>
-      <Stack spacing={4}>
+      <Stack spacing={4} sx={{ maxWidth: 1180, mx: 'auto', width: '100%' }}>
         <Stack spacing={1}>
           <Button
             component={RouterLink}
@@ -315,7 +358,40 @@ export default function ManageJobApplications() {
           )}
         </Stack>
 
-        <Card sx={{ p: 3 }}>
+        <Card
+          sx={{
+            p: 2.5,
+            border: 1,
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}
+        >
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems="center">
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+              סטטוסים בעמוד הנוכחי:
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {APPLICATION_STATUS_KEYS.map((key) => (
+                <Stack key={`summary-${key}`} direction="row" spacing={0.75} alignItems="center">
+                  <ApplicationStatusChip status={key} />
+                  <Typography variant="body2" color="text.secondary">
+                    {statusCounts[key] ?? 0}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+
+        <Card
+          sx={{
+            p: 3,
+            border: 1,
+            borderColor: 'divider',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}
+        >
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             spacing={2}
@@ -411,7 +487,15 @@ export default function ManageJobApplications() {
               const studentInitial = studentName.charAt(0).toUpperCase();
 
               return (
-                <Card key={item.applicationId} sx={{ p: { xs: 2, md: 3 } }}>
+                <Card
+                  key={item.applicationId}
+                  sx={{
+                    p: { xs: 2, md: 3 },
+                    border: 1,
+                    borderColor: 'divider',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+                  }}
+                >
                   <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                     <Stack
                       direction={{ xs: 'column', md: 'row' }}
@@ -474,6 +558,7 @@ export default function ManageJobApplications() {
 
                       <ApplicationStatusChip
                         status={item.status}
+                        variant="filled"
                         sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }}
                       />
                     </Stack>
@@ -515,43 +600,112 @@ export default function ManageJobApplications() {
                     </Box>
 
                     <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: 'wrap', rowGap: 1 }}>
-                      {item.resumeUrl && (
+                      <Box
+                        sx={{
+                          width: '100%',
+                          display: 'grid',
+                          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(180px, 1fr))' },
+                          gap: 1,
+                          alignItems: 'stretch',
+                          mt: 0.5,
+                        }}
+                      >
                         <Button
-                          component={MuiLink}
-                          href={item.resumeUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          startIcon={<DescriptionOutlinedIcon />}
-                        >
-                          קורות חיים
-                        </Button>
-                      )}
-                      {item.student?.email && (
-                        <Button
-                          component={MuiLink}
-                          href={`mailto:${item.student.email}`}
                           variant="text"
                           size="small"
-                          startIcon={<MailOutlineOutlinedIcon />}
+                          color="inherit"
+                          startIcon={<ExpandMoreOutlinedIcon />}
+                          onClick={() => setSelectedApplicationId(item.applicationId)}
+                          sx={{
+                            minHeight: 40,
+                            minWidth: 180,
+                            justifyContent: 'flex-start',
+                            whiteSpace: 'nowrap',
+                            '& .MuiButton-startIcon': { minWidth: 20, justifyContent: 'center' },
+                          }}
                         >
-                          שליחת מייל
+                          לחצי להרחבה וצפייה בפרטים
                         </Button>
-                      )}
-                      {item.jobWebsiteUrl && (
+
                         <Button
-                          component={MuiLink}
-                          href={item.jobWebsiteUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="text"
+                          variant="contained"
                           size="small"
-                          startIcon={<OpenInNewOutlinedIcon />}
+                          startIcon={<VisibilityOutlinedIcon />}
+                          onClick={() => setSelectedApplicationId(item.applicationId)}
+                          sx={{
+                            minHeight: 40,
+                            minWidth: 180,
+                            whiteSpace: 'nowrap',
+                            '& .MuiButton-startIcon': { minWidth: 20, justifyContent: 'center' },
+                          }}
                         >
-                          לאתר המשרה
+                          צפה במועמד
                         </Button>
-                      )}
+
+                        {item.resumeUrl ? (
+                          <Button
+                            component={MuiLink}
+                            href={item.resumeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="outlined"
+                            size="small"
+                            startIcon={<DescriptionOutlinedIcon />}
+                            sx={{
+                              minHeight: 40,
+                              minWidth: 180,
+                              whiteSpace: 'nowrap',
+                              '& .MuiButton-startIcon': { minWidth: 20, justifyContent: 'center' },
+                            }}
+                          >
+                            קורות חיים
+                          </Button>
+                        ) : (
+                          <Box sx={{ minHeight: 40 }} />
+                        )}
+
+                        {item.student?.email ? (
+                          <Button
+                            component={MuiLink}
+                            href={`mailto:${item.student.email}`}
+                            variant="text"
+                            size="small"
+                            startIcon={<MailOutlineOutlinedIcon />}
+                            sx={{
+                              minHeight: 40,
+                              minWidth: 180,
+                              whiteSpace: 'nowrap',
+                              '& .MuiButton-startIcon': { minWidth: 20, justifyContent: 'center' },
+                            }}
+                          >
+                            שליחת מייל
+                          </Button>
+                        ) : (
+                          <Box sx={{ minHeight: 40 }} />
+                        )}
+
+                        {item.jobWebsiteUrl ? (
+                          <Button
+                            component={MuiLink}
+                            href={item.jobWebsiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="text"
+                            size="small"
+                            startIcon={<OpenInNewOutlinedIcon />}
+                            sx={{
+                              minHeight: 40,
+                              minWidth: 180,
+                              whiteSpace: 'nowrap',
+                              '& .MuiButton-startIcon': { minWidth: 20, justifyContent: 'center' },
+                            }}
+                          >
+                            לאתר המשרה
+                          </Button>
+                        ) : (
+                          <Box sx={{ minHeight: 40 }} />
+                        )}
+                      </Box>
                     </Stack>
 
                     <Divider sx={{ my: 2 }} />
@@ -585,6 +739,7 @@ export default function ManageJobApplications() {
                         spacing={2}
                         alignItems={{ xs: 'stretch', md: 'center' }}
                         justifyContent="space-between"
+                        sx={{ pt: 0.5 }}
                       >
                         <FormControl size="small" sx={{ minWidth: 240 }}>
                           <InputLabel id={`status-select-${item.applicationId}`}>סטטוס מועמדות</InputLabel>
@@ -616,22 +771,26 @@ export default function ManageJobApplications() {
                           justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
                           flexWrap="wrap"
                           rowGap={1}
+                          sx={{ minHeight: 40 }}
                         >
-                          {draft?.error && (
-                            <Typography variant="body2" color="error">
-                              {draft.error}
-                            </Typography>
-                          )}
-                          {!draft?.error && draft?.savedAt && !isDirty && (
-                            <Typography variant="body2" color="success.main">
-                              נשמר בהצלחה
-                            </Typography>
-                          )}
+                          <Box sx={{ minWidth: 150, minHeight: 24, display: 'flex', alignItems: 'center' }}>
+                            {draft?.error && (
+                              <Typography variant="body2" color="error">
+                                {draft.error}
+                              </Typography>
+                            )}
+                            {!draft?.error && draft?.savedAt && !isDirty && (
+                              <Typography variant="body2" color="success.main">
+                                נשמר בהצלחה
+                              </Typography>
+                            )}
+                          </Box>
                           <Button
                             variant="contained"
                             onClick={() => handleSave(item.applicationId)}
                             disabled={!isDirty || draft?.saving}
                             startIcon={<SaveOutlinedIcon />}
+                            sx={{ minWidth: 150, minHeight: 40 }}
                           >
                             {draft?.saving ? 'שומר...' : 'שמירת שינויים'}
                           </Button>
@@ -657,6 +816,142 @@ export default function ManageJobApplications() {
           </Box>
         )}
       </Stack>
+
+      <Dialog
+        open={Boolean(selectedItem)}
+        onClose={() => setSelectedApplicationId(null)}
+        fullWidth
+        maxWidth="md"
+      >
+        {selectedItem && (
+          <>
+            <DialogTitle sx={{ pb: 1 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    פרטי מועמדות
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedItem.student?.name || 'מועמדת'}
+                  </Typography>
+                </Box>
+                <Button variant="text" color="inherit" onClick={() => setSelectedApplicationId(null)}>
+                  סגירה
+                </Button>
+              </Stack>
+            </DialogTitle>
+
+            <DialogContent>
+              <Stack spacing={3}>
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
+                    עדכן סטטוס
+                  </Typography>
+                  <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+                    {STATUS_ACTIONS.map((action) => (
+                      <Button
+                        key={action.key}
+                        variant={selectedStatus === action.key ? 'contained' : 'outlined'}
+                        color={action.color}
+                        onClick={() => updateStatusDraft(selectedItem.applicationId, action.key)}
+                      >
+                        {action.label}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Box>
+
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
+                    מכתב מקדים
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={3}
+                    value={selectedItem.coverLetter || ''}
+                    placeholder="אין מכתב מקדים"
+                    InputProps={{ readOnly: true }}
+                  />
+                </Box>
+
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 700 }}>
+                    קורות חיים
+                  </Typography>
+                  {selectedItem.resumeUrl ? (
+                    <Button
+                      component={MuiLink}
+                      href={selectedItem.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="contained"
+                      startIcon={<DescriptionOutlinedIcon />}
+                    >
+                      הורד קורות חיים
+                    </Button>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      לא צורף קובץ קורות חיים.
+                    </Typography>
+                  )}
+                </Box>
+
+                <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#fffbea', border: '1px solid #f4dc73' }}>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                    <LockOutlinedIcon fontSize="small" />
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                      הערות פנימיות (פרטיות)
+                    </Typography>
+                  </Stack>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    value={selectedNotes}
+                    onChange={(event) =>
+                      updateDraft(selectedItem.applicationId, { notes: event.target.value })
+                    }
+                    placeholder="הוסף הערות פרטיות על המועמד (לא יוצגו לסטודנט)..."
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    הערות אלו נראות רק למנהלים ולא יוצגו לסטודנט.
+                  </Typography>
+                </Box>
+              </Stack>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 2.5, justifyContent: 'space-between' }}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                {selectedDraft?.error && (
+                  <Typography variant="body2" color="error">
+                    {selectedDraft.error}
+                  </Typography>
+                )}
+                {!selectedDraft?.error && selectedDraft?.savedAt && !selectedDirty && (
+                  <Typography variant="body2" color="success.main">
+                    נשמר בהצלחה
+                  </Typography>
+                )}
+              </Stack>
+              <Stack direction="row" spacing={1.5}>
+                <Button onClick={() => setSelectedApplicationId(null)} color="inherit">
+                  ביטול
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<SaveOutlinedIcon />}
+                  onClick={() => handleSave(selectedItem.applicationId)}
+                  disabled={!selectedDirty || selectedDraft?.saving}
+                  sx={{ minWidth: 150, minHeight: 40 }}
+                >
+                  {selectedDraft?.saving ? 'שומר...' : 'שמור שינויים'}
+                </Button>
+              </Stack>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </PageShell>
   );
 }

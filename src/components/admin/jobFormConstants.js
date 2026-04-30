@@ -1,6 +1,12 @@
 /**
- * Dropdown labels (Hebrew UI) and mapping from API enum names to numeric indices
- * for .NET JobType / Field.
+ * jobFormConstants
+ * ----------------
+ * Shared option sets and conversion helpers for admin job forms.
+ *
+ * Why this module exists:
+ * - Keep enum/value mapping logic in one place.
+ * - Provide consistent labels for create/edit/view experiences.
+ * - Shield UI components from API enum format differences.
  */
 export const JOB_TYPE_OPTIONS = [
   { value: 0, label: "משרה מלאה" },
@@ -36,7 +42,7 @@ export function fieldFromApi(value) {
   return FIELD_FROM_API[value] ?? 0;
 }
 
-/** Hebrew label for JobType from API (enum name or 0–2). */
+/** Maps API job type enum/string to Hebrew label for UI display. */
 export function jobTypeLabelHe(apiValue) {
   if (typeof apiValue === "number" && apiValue >= 0 && apiValue <= 2) {
     return JOB_TYPE_OPTIONS[apiValue]?.label ?? String(apiValue);
@@ -45,7 +51,8 @@ export function jobTypeLabelHe(apiValue) {
   return idx !== undefined ? JOB_TYPE_OPTIONS[idx].label : String(apiValue ?? "");
 }
 
-/** Hebrew label for Field from API (enum name or 0–2). */
+
+/** Maps API field enum/string to Hebrew label for UI display. */
 export function fieldLabelHe(apiValue) {
   if (typeof apiValue === "number" && apiValue >= 0 && apiValue <= 2) {
     return FIELD_OPTIONS[apiValue]?.label ?? String(apiValue);

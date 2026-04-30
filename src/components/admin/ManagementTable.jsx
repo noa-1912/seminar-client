@@ -1,5 +1,19 @@
 /**
- * Manager jobs table: list, view dialog, edit modal.
+ * ManagementTable
+ * ---------------
+ * Operational jobs table for managers with end-to-end actions.
+ *
+ * Core capabilities:
+ * - List jobs with status and candidate counters.
+ * - Search by title/company and filter by job status.
+ * - Open read-only job details dialog.
+ * - Open edit flow in modal form.
+ * - Trigger quick actions (email, close/reopen, delete).
+ * - Navigate to per-job applications management.
+ *
+ * Design intent:
+ * - Keep row actions compact but stable (fixed icon-button sizing).
+ * - Centralize table refresh after mutations to preserve consistency.
  */
 import {
   Alert,
@@ -9,9 +23,12 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  InputAdornment,
   IconButton,
   Link,
+  MenuItem,
   Paper,
+  Snackbar,
   Stack,
   Table,
   TableBody,
@@ -19,17 +36,23 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import EditJobForm from "./EditJobForm";
 import { fieldLabelHe, jobTypeLabelHe } from "./jobFormConstants";
-import { getJobById, getManagementJobs } from "./adminService";
+import { deleteJob, getJobById, getManagementJobs, updateJobStatus } from "./adminService";
 
 /** Maps API JobStatus string to Hebrew chip label */
 const statusLabels = {
@@ -56,11 +79,8 @@ function formatDate(dateValue) {
   return `${day}.${month}.${year}`;
 }
 
-function logAction(actionName, jobId) {
-  console.log(`[ManagementTable] ${actionName}`, jobId);
-}
-
 export default function ManagementTable() {
+  const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -72,6 +92,10 @@ export default function ManagementTable() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [editJobId, setEditJobId] = useState(null);
+  const [actionLoadingByJobId, setActionLoadingByJobId] = useState({});
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const refreshRows = useCallback(async () => {
     const nextRows = await getManagementJobs();
@@ -138,10 +162,68 @@ export default function ManagementTable() {
     handleCloseEdit();
     try {
       await refreshRows();
+      setSuccessMessage("המשרה נשמרה בהצלחה.");
     } catch {
       setError("לא ניתן לרענן את הטבלה. רענני את הדף.");
     }
   };
+
+  const handleOpenApplications = (jobId) => {
+    navigate(`/jobs/${jobId}/applications`);
+  };
+
+  const setJobActionLoading = (jobId, isLoadingAction) => {
+    setActionLoadingByJobId((prev) => ({ ...prev, [jobId]: isLoadingAction }));
+  };
+
+  const handleSendEmail = (row) => {
+    const subject = encodeURIComponent(`עדכון עבור המשרה: ${row.title}`);
+    window.open(`mailto:?subject=${subject}`, "_blank");
+  };
+
+  const handleToggleJobStatus = async (row) => {
+    const nextStatus = row.status === "Closed" ? "Open" : "Closed";
+    setJobActionLoading(row.id, true);
+    try {
+      await updateJobStatus(row.id, nextStatus);
+      await refreshRows();
+      setSuccessMessage(
+        nextStatus === "Closed" ? "המשרה נסגרה בהצלחה." : "המשרה נפתחה מחדש בהצלחה."
+      );
+    } catch (e) {
+      setError(e?.message || "עדכון סטטוס המשרה נכשל.");
+    } finally {
+      setJobActionLoading(row.id, false);
+    }
+  };
+
+  const handleDeleteJob = async (row) => {
+    const confirmed = window.confirm(`למחוק את המשרה "${row.title}"?`);
+    if (!confirmed) return;
+
+    setJobActionLoading(row.id, true);
+    try {
+      await deleteJob(row.id);
+      await refreshRows();
+      setSuccessMessage("המשרה נמחקה בהצלחה.");
+    } catch (e) {
+      setError(e?.message || "מחיקת המשרה נכשלה.");
+    } finally {
+      setJobActionLoading(row.id, false);
+    }
+  };
+
+  const filteredRows = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return rows.filter((row) => {
+      const byStatus = statusFilter === "all" || row.status === statusFilter;
+      const byQuery =
+        !normalizedQuery ||
+        String(row.title).toLowerCase().includes(normalizedQuery) ||
+        String(row.company).toLowerCase().includes(normalizedQuery);
+      return byStatus && byQuery;
+    });
+  }, [rows, query, statusFilter]);
 
   return (
     <Box className="jobs-admin__management">
@@ -157,8 +239,55 @@ export default function ManagementTable() {
         </Stack>
       ) : null}
 
+      <Paper
+        className="jobs-admin__search-bar"
+        variant="outlined"
+        sx={{
+          mb: 1.5,
+          p: 1.5,
+          display: "flex",
+          gap: 1.5,
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ flexGrow: 1 }}>
+          <TextField
+            size="small"
+            placeholder="חיפוש לפי שם משרה או חברה..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            sx={{ minWidth: 260 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchOutlinedIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            select
+            size="small"
+            label="סטטוס"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            sx={{ minWidth: 160 }}
+          >
+            <MenuItem value="all">הכל</MenuItem>
+            <MenuItem value="Open">פתוח</MenuItem>
+            <MenuItem value="Pending">ממתין</MenuItem>
+            <MenuItem value="Closed">סגור</MenuItem>
+          </TextField>
+        </Stack>
+        <Typography variant="body2" color="text.secondary">
+          מוצגות {filteredRows.length} מתוך {rows.length} משרות
+        </Typography>
+      </Paper>
+
       <TableContainer component={Paper} className="jobs-admin__management-table">
-        <Table size="small" aria-label="management jobs table">
+        <Table size="small" aria-label="management jobs table" className="jobs-admin__table">
           <TableHead>
             <TableRow>
               <TableCell>כותרת</TableCell>
@@ -171,7 +300,7 @@ export default function ManagementTable() {
           </TableHead>
 
           <TableBody>
-            {rows.map((row) => (
+            {filteredRows.map((row) => (
               <TableRow key={row.id} hover>
                 <TableCell>
                   <Stack spacing={0.25}>
@@ -199,7 +328,7 @@ export default function ManagementTable() {
                     component="button"
                     type="button"
                     underline="hover"
-                    onClick={() => logAction("candidates", row.id)}
+                    onClick={() => handleOpenApplications(row.id)}
                   >
                     {row.candidates}
                   </Link>
@@ -208,26 +337,49 @@ export default function ManagementTable() {
                 <TableCell>{formatDate(row.lastUpdate)}</TableCell>
 
                 <TableCell align="right">
-                  <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                    {row.status !== "Closed" ? (
-                      <Tooltip title="צפייה במשרה (קריאה בלבד)">
+                  <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
+                    <Box sx={{ width: 18, display: "flex", justifyContent: "center" }}>
+                      {actionLoadingByJobId[row.id] ? <CircularProgress size={16} /> : null}
+                    </Box>
+                    <Tooltip title={row.status !== "Closed" ? "צפייה במשרה (קריאה בלבד)" : "משרה סגורה"}>
+                      <span>
                         <IconButton
                           size="small"
                           onClick={() => handleOpenView(row.id)}
                           aria-label={`צפייה במשרה ${row.title}`}
+                          disabled={row.status === "Closed"}
+                          className="jobs-admin__action-btn"
                         >
                           <VisibilityOutlinedIcon fontSize="small" />
                         </IconButton>
-                      </Tooltip>
-                    ) : null}
+                      </span>
+                    </Tooltip>
 
                     <Tooltip title="אימייל">
                       <IconButton
                         size="small"
-                        onClick={() => logAction("email", row.id)}
+                        onClick={() => handleSendEmail(row)}
                         aria-label={`אימייל ${row.title}`}
+                        disabled={Boolean(actionLoadingByJobId[row.id])}
+                        className="jobs-admin__action-btn"
                       >
                         <EmailOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title={row.status === "Closed" ? "פתיחה מחדש" : "סגירת משרה"}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleToggleJobStatus(row)}
+                        aria-label={row.status === "Closed" ? `פתיחת ${row.title}` : `סגירת ${row.title}`}
+                        disabled={Boolean(actionLoadingByJobId[row.id])}
+                        className="jobs-admin__action-btn"
+                      >
+                        {row.status === "Closed" ? (
+                          <LockOpenOutlinedIcon fontSize="small" />
+                        ) : (
+                          <LockOutlinedIcon fontSize="small" />
+                        )}
                       </IconButton>
                     </Tooltip>
 
@@ -236,8 +388,22 @@ export default function ManagementTable() {
                         size="small"
                         onClick={() => handleOpenEdit(row.id)}
                         aria-label={`עריכת ${row.title}`}
+                        disabled={Boolean(actionLoadingByJobId[row.id])}
+                        className="jobs-admin__action-btn"
                       >
                         <EditOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="ניהול מועמדויות">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenApplications(row.id)}
+                        aria-label={`ניהול מועמדויות עבור ${row.title}`}
+                        disabled={Boolean(actionLoadingByJobId[row.id])}
+                        className="jobs-admin__action-btn"
+                      >
+                        <GroupsOutlinedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
 
@@ -245,8 +411,10 @@ export default function ManagementTable() {
                       <IconButton
                         size="small"
                         color="error"
-                        onClick={() => logAction("delete", row.id)}
+                        onClick={() => handleDeleteJob(row)}
                         aria-label={`מחיקת ${row.title}`}
+                        disabled={Boolean(actionLoadingByJobId[row.id])}
+                        className="jobs-admin__action-btn"
                       >
                         <DeleteOutlineIcon fontSize="small" />
                       </IconButton>
@@ -256,11 +424,11 @@ export default function ManagementTable() {
               </TableRow>
             ))}
 
-            {!isLoading && rows.length === 0 ? (
+            {!isLoading && filteredRows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">
                   <Typography variant="body2" color="text.secondary">
-                    אין משרות להצגה כרגע.
+                    לא נמצאו משרות לפי הסינון הנוכחי.
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -270,7 +438,7 @@ export default function ManagementTable() {
       </TableContainer>
 
       <Dialog open={viewOpen} onClose={handleCloseView} fullWidth maxWidth="sm">
-        <DialogTitle>צפייה במשרה</DialogTitle>
+        <DialogTitle className="jobs-admin__dialog-title">צפייה במשרה</DialogTitle>
         <DialogContent>
           {viewLoading ? (
             <Stack alignItems="center" py={2}>
@@ -327,18 +495,29 @@ export default function ManagementTable() {
               <Typography variant="body2" color="text.secondary">
                 פורסם: {formatDate(viewJob.createdAt ?? viewJob.CreatedAt)}
               </Typography>
-              {Array.isArray(viewJob.tags ?? viewJob.Tags) && (viewJob.tags ?? viewJob.Tags).length ? (
-                <Typography variant="body2">
-                  <strong>תגיות:</strong> {(viewJob.tags ?? viewJob.Tags).join(", ")}
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.75 }}>
+                  תגיות:
                 </Typography>
-              ) : null}
+                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
+                  {(viewJob.tags ?? viewJob.Tags ?? []).length > 0 ? (
+                    (viewJob.tags ?? viewJob.Tags).map((tag) => (
+                      <Chip key={String(tag)} size="small" label={String(tag)} color="secondary" variant="outlined" />
+                    ))
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      ללא תגיות
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
             </Stack>
           ) : null}
         </DialogContent>
       </Dialog>
 
       <Dialog open={editOpen} onClose={handleCloseEdit} fullWidth maxWidth="md">
-        <DialogTitle>עריכת משרה</DialogTitle>
+        <DialogTitle className="jobs-admin__dialog-title">עריכת משרה</DialogTitle>
         <DialogContent>
           <EditJobForm
             open={editOpen}
@@ -348,6 +527,17 @@ export default function ManagementTable() {
           />
         </DialogContent>
       </Dialog>
+
+      <Snackbar
+        open={Boolean(successMessage)}
+        autoHideDuration={3000}
+        onClose={() => setSuccessMessage("")}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" variant="filled" onClose={() => setSuccessMessage("")}>
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
