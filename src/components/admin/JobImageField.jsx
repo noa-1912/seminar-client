@@ -1,12 +1,27 @@
 /**
- * Job listing image: file upload (POST /api/files/job-image) or optional HTTPS URL.
- * Stored server-side; URL is persisted on the job as ImageUrl / jobImageUrl.
+ * JobImageField
+ * -------------
+ * Reusable image input for job forms.
+ *
+ * Supports two paths:
+ * - Upload local image file to backend storage.
+ * - Provide direct HTTPS image URL manually.
+ *
+ * Output:
+ * - Emits a canonical image URL through `onChange`.
+ * - Used by both create and edit job forms.
  */
 import { useRef, useState } from "react";
 import { Box, Button, Stack, TextField } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { uploadJobImage } from "./adminService";
 
+/**
+ * @param {Object} props
+ * @param {string} props.value Current image URL.
+ * @param {(url: string) => void} props.onChange Emits new image URL.
+ * @param {boolean} props.disabled Disables control interactions.
+ */
 export default function JobImageField({ value, onChange, disabled }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
