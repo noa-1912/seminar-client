@@ -21,6 +21,8 @@ function getPalette(mode) {
     background: {
       default: isDark ? '#1a1715' : '#f6f1ee',
       paper: isDark ? '#26211d' : '#ffffff',
+      /** Backplate behind the HireLink mark in the header (translates to PNG transparent areas). */
+      headerLogo: isDark ? '#1a1615' : '#fff0eb',
     },
     text: {
       primary: isDark ? '#eee4db' : '#4a4540',

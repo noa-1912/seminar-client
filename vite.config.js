@@ -7,11 +7,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:7000',
+        target: 'http://localhost:5157',
         changeOrigin: true,
       },
       '/gateway': {
-        target: 'http://localhost:7000',
+        target: 'http://localhost:5243',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/gateway/, ''),
       },

@@ -1,0 +1,27 @@
+.create-slots {
+  direction: rtl;
+}
+
+.create-slots__form {
+  background-color: var(--mui-palette-background-paper, #ffffff);
+  border: 1px solid var(--mui-palette-divider, rgba(0, 0, 0, 0.08));
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.create-slots__preview {
+  background-color: rgba(248, 228, 234, 0.55);
+  border: 1px dashed rgba(154, 149, 144, 0.45);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 600px) {
+  .create-slots__form {
+    padding: 18px;
+    border-radius: 14px;
+  }
+}
