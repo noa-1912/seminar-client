@@ -1,23 +1,23 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
 import {
+  JobDetailsPage,
   JobsBoardPage,
   ManageJobApplications,
   MyApplications,
   PersonalArea,
   PrivateInvitations,
-} from './components/jobs'
-import Home from './pages/Home/Home'
-import JobDetailsPage from './pages/Jobs/JobDetailsPage'
-import About from './pages/About/About'
-import Contact from './pages/Contact/Contact'
-import Login from './pages/Login/Login'
-import Signup from './pages/Signup/Signup'
-import Settings from './pages/Settings/Settings'
-import Profiles from './pages/Profiles/Profiles'
-import StudentAvailabilityPage from './pages/Scheduling/StudentAvailability/StudentAvailabilityPage.jsx'
-import CreateInterviewSlots from './components/Scheduling/CreateInterviewSlots'
-import ScheduledInterviews from './pages/ScheduledInterviews/ScheduledInterviews'
+} from './components/team4'
+import Home from './components/team1/marketing/Home/Home'
+import About from './components/team1/marketing/About/About'
+import Contact from './components/team1/marketing/Contact/Contact'
+import Login from './components/team2/Login/Login'
+import Signup from './components/team2/Signup/Signup'
+import Settings from './components/team1/Settings/Settings'
+import Profiles from './components/team3/Profiles/Profiles'
+import StudentAvailabilityPage from './components/team5/availability/StudentAvailabilityPage.jsx'
+import CreateInterviewSlots from './components/team5/interviews/CreateInterviewSlots'
+import ScheduledInterviews from './components/team5/interviews/ScheduledInterviews/ScheduledInterviews'
 import AdminDashboard from './components/admin/AdminDashboard'
 
 function App() {
