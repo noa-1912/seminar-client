@@ -15,7 +15,8 @@ import { BarChart } from '@mui/x-charts';
 import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
-import PageShell from '../../../PageShell/PageShell';
+import { Link as RouterLink } from 'react-router-dom';
+import PageShell from '../../PageShell/PageShell';
 
 const defaultStatsPayload = {
   totalGraduates: 12,
@@ -135,8 +136,12 @@ export default function Home() {
             </Typography>
 
             <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
-              <Button variant="contained">להרשמה</Button>
-              <Button variant="outlined">לפרטים נוספים</Button>
+              <Button variant="contained" component={RouterLink} to="/signup">
+                להרשמה
+              </Button>
+              <Button variant="outlined" component={RouterLink} to="/about">
+                לפרטים נוספים
+              </Button>
             </Stack>
 
             <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap' }}>

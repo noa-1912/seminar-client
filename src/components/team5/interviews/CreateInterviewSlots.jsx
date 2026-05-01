@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import {
   Alert,
   Box,
@@ -158,6 +158,17 @@ export default function CreateInterviewSlots() {
   return (
     <PageShell>
       <Stack spacing={3} className="create-slots">
+        {jobIdParam ? (
+          <Button
+            component={RouterLink}
+            to={`/jobs/${jobIdParam}/applications`}
+            variant="text"
+            size="small"
+            sx={{ alignSelf: 'flex-start' }}
+          >
+            חזרה לניהול מועמדויות
+          </Button>
+        ) : null}
         <Stack spacing={0.5}>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
             יצירת ראיונות חדשים
