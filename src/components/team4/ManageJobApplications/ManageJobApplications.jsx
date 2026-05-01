@@ -314,16 +314,29 @@ export default function ManageJobApplications() {
     <PageShell>
       <Stack spacing={4} sx={{ maxWidth: 1180, mx: 'auto', width: '100%' }}>
         <Stack spacing={1}>
-          <Button
-            component={RouterLink}
-            to="/jobs"
-            variant="text"
-            size="small"
-            startIcon={<ArrowForwardOutlinedIcon />}
-            sx={{ alignSelf: 'flex-start' }}
-          >
-            חזרה ללוח המשרות
-          </Button>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ alignItems: 'center' }}>
+            <Button
+              component={RouterLink}
+              to="/jobs"
+              variant="text"
+              size="small"
+              startIcon={<ArrowForwardOutlinedIcon />}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              חזרה ללוח המשרות
+            </Button>
+            {jobId ? (
+              <Button
+                component={RouterLink}
+                to={`/jobs/${jobId}/interview-slots/new`}
+                variant="outlined"
+                size="small"
+                startIcon={<EventOutlinedIcon />}
+              >
+                קביעת חלונות ריאיון
+              </Button>
+            ) : null}
+          </Stack>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
             ניהול מועמדויות למשרה
           </Typography>

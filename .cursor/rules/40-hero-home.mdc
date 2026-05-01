@@ -1,6 +1,6 @@
 ---
 description: Home Hero section implementation requirements (no emojis)
-globs: src/components/team1/marketing/Home/**/*.{js,jsx}
+globs: src/components/team6/Home/**/*.{js,jsx}
 alwaysApply: false
 ---
 

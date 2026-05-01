@@ -2,12 +2,15 @@ import { Box, Card, CardActionArea, CardContent, Grid, Stack, Typography } from 
 import { Link as RouterLink } from 'react-router-dom';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
+import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
+import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 import PageShell from '../../PageShell/PageShell';
 import ApplicationsSummary from '../ApplicationsSummary/ApplicationsSummary';
 import UnreadInvitationsChip from '../UnreadInvitationsChip/UnreadInvitationsChip';
 import AdminDashboard from '../../admin/AdminDashboard';
 import { useAuth } from '../../../auth/AuthContext';
+import { isManagerRole } from '../../../auth/resolveUserRole';
 
 function SectionCard({ to, title, description, icon: Icon, badge }) {
   return (
@@ -58,37 +61,6 @@ function SectionCard({ to, title, description, icon: Icon, badge }) {
   );
 }
 
-function extractRoleFromJwt(token) {
-  if (!token) return '';
-  try {
-    const payloadPart = token.split('.')[1];
-    if (!payloadPart) return '';
-    const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
-    const json = JSON.parse(atob(normalized));
-
-    return (
-      json?.role ||
-      json?.roles?.[0] ||
-      json?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
-      ''
-    );
-  } catch {
-    return '';
-  }
-}
-
-function resolveCurrentUserRole(user) {
-  const directRole = user?.role || user?.Role || user?.roles?.[0] || user?.Roles?.[0];
-  if (directRole) return String(directRole);
-
-  const token =
-    (typeof window !== 'undefined' && window.localStorage.getItem('authToken')) ||
-    (typeof window !== 'undefined' && window.localStorage.getItem('token')) ||
-    '';
-
-  return extractRoleFromJwt(token);
-}
-
 function StudentPersonalArea() {
   return (
     <PageShell>
@@ -133,6 +105,24 @@ function StudentPersonalArea() {
               }
             />
           </Grid>
+
+          <Grid item xs={12} md={6}>
+            <SectionCard
+              to="/my-interviews"
+              title="הריאיונות שלי"
+              description="כל הריאיונות המתוכננים שלך במקום אחד — סינון לפי סטטוס ופרטים מלאים על כל מועד."
+              icon={EventNoteOutlinedIcon}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <SectionCard
+              to="/student-availability"
+              title="זמינות לריאיונות"
+              description="עדכני מתי את זמינה לריאיונות כדי שהמערכת והמנהלות יוכלו לתאם איתך בקלות."
+              icon={EventAvailableOutlinedIcon}
+            />
+          </Grid>
         </Grid>
       </Stack>
     </PageShell>
@@ -141,10 +131,8 @@ function StudentPersonalArea() {
 
 export default function PersonalArea() {
   const { user } = useAuth();
-  const role = resolveCurrentUserRole(user).toLowerCase();
-  const isManager = role === 'manager' || role === 'admin' || role === 'employer';
 
-  if (isManager) {
+  if (isManagerRole(user)) {
     return <AdminDashboard />;
   }
 

@@ -8,7 +8,7 @@ import {
   PersonalArea,
   PrivateInvitations,
 } from './components/team4'
-import Home from './components/team1/marketing/Home/Home'
+import Home from './components/team6/Home/Home'
 import About from './components/team1/marketing/About/About'
 import Contact from './components/team1/marketing/Contact/Contact'
 import Login from './components/team2/Login/Login'

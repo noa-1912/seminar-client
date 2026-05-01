@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -6,14 +6,18 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext';
+import { isManagerRole } from '../../../auth/resolveUserRole';
 import { useThemeMode } from '../../../theme/useThemeMode';
 import './Header.css';
 
 const navLinks = [
   { label: 'דף הבית', path: '/' },
   { label: 'משרות', path: '/jobs' },
-  { label: 'איזור אישי', path: '/personal-area', matchPrefixes: ['/my-applications', '/private-invitations'] },
-  { label: 'הריאיונות שלי', path: '/my-interviews' },
+  {
+    label: 'איזור אישי',
+    path: '/personal-area',
+    matchPrefixes: ['/my-applications', '/private-invitations', '/student-availability', '/my-interviews'],
+  },
   { label: 'פרופילים', path: '/profiles' },
   { label: 'אודות', path: '/about' },
   { label: 'צור קשר', path: '/contact' },
@@ -35,6 +39,14 @@ function Header() {
   const { isAuthenticated, user, signOut } = useAuth();
   const hireLinkLogoSrc =
     mode === 'dark' ? '/logo-hirelink-dark.png' : '/logo-hirelink-light.png';
+
+  const navLinksResolved = useMemo(() => {
+    if (!isAuthenticated || !isManagerRole(user)) {
+      return navLinks;
+    }
+    const managerLink = { label: 'לוח בקרה למנהלת', path: '/admin' };
+    return [...navLinks.slice(0, 3), managerLink, ...navLinks.slice(3)];
+  }, [isAuthenticated, user]);
 
   async function handleSignOut() {
     await signOut();
@@ -119,7 +131,7 @@ function Header() {
         </Box>
 
         <Box className="header-nav" component="nav">
-          {navLinks.map((link) => {
+          {navLinksResolved.map((link) => {
             const active = isLinkActive(pathname, link);
             return (
               <Button
@@ -181,7 +193,7 @@ function Header() {
 
       {mobileOpen && (
         <Box className="header-mobile-nav">
-          {navLinks.map((link) => {
+          {navLinksResolved.map((link) => {
             const active = isLinkActive(pathname, link);
             return (
               <Button
