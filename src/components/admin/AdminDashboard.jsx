@@ -42,6 +42,7 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import CreateJobForm from "./CreateJobForm";
 import ManagementTable from "./ManagementTable";
 import AdminApplicationsPanel from "./AdminApplicationsPanel";
+import AdminInterviewSchedulingPanel from "./AdminInterviewSchedulingPanel";
 import { getAdminDashboardStats } from "./adminService";
 import "./jobsAdmin.css";
 import "../../theme/Theme.css";
@@ -197,11 +198,18 @@ export default function AdminDashboard() {
         >
           <Tab label="ניהול משרות" />
           <Tab label="ניהול מועמדויות" />
+          <Tab label="תזמון ראיונות" />
         </Tabs>
       </Box>
 
       <Box sx={{ mt: 2 }}>
-        {activeTab === 0 ? <ManagementTable /> : <AdminApplicationsPanel />}
+        {activeTab === 0 ? (
+          <ManagementTable />
+        ) : activeTab === 1 ? (
+          <AdminApplicationsPanel />
+        ) : (
+          <AdminInterviewSchedulingPanel />
+        )}
       </Box>
 
       <Dialog

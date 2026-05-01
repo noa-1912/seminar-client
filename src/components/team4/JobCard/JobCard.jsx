@@ -38,10 +38,10 @@ export default function JobCard({ job, onClick }) {
     navigate(`/jobs/${job.jobId}`);
   };
 
-  const handleOpenInterviewSlots = (event) => {
+  const handleOpenInterviewScheduling = (event) => {
     event?.stopPropagation?.();
     if (!canNavigateToDetails) return;
-    navigate(`/jobs/${job.jobId}/interview-slots/new`);
+    navigate(`/jobs/${job.jobId}/interview-slots`);
   };
 
   const content = (
@@ -156,7 +156,7 @@ export default function JobCard({ job, onClick }) {
               variant="text"
               size="small"
               startIcon={<EventAvailableOutlinedIcon fontSize="small" />}
-              onClick={handleOpenInterviewSlots}
+              onClick={handleOpenInterviewScheduling}
               disabled={!canNavigateToDetails}
               sx={{
                 fontWeight: 600,
@@ -164,7 +164,7 @@ export default function JobCard({ job, onClick }) {
                 '&:hover': { bgcolor: 'action.hover' },
               }}
             >
-              קביעת ראיונות
+              תזמון ראיונות
             </Button>
           </Stack>
         </Stack>

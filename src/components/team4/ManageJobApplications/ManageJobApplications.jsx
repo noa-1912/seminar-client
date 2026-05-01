@@ -328,12 +328,12 @@ export default function ManageJobApplications() {
             {jobId ? (
               <Button
                 component={RouterLink}
-                to={`/jobs/${jobId}/interview-slots/new`}
+                to={`/jobs/${jobId}/interview-slots`}
                 variant="outlined"
                 size="small"
                 startIcon={<EventOutlinedIcon />}
               >
-                קביעת חלונות ריאיון
+                תזמון ראיונות
               </Button>
             ) : null}
           </Stack>

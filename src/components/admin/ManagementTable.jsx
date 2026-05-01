@@ -50,6 +50,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import EditJobForm from "./EditJobForm";
 import { fieldLabelHe, jobTypeLabelHe } from "./jobFormConstants";
 import { deleteJob, getJobById, getManagementJobs, updateJobStatus } from "./adminService";
@@ -170,6 +171,10 @@ export default function ManagementTable() {
 
   const handleOpenApplications = (jobId) => {
     navigate(`/jobs/${jobId}/applications`);
+  };
+
+  const handleOpenInterviewScheduling = (jobId) => {
+    navigate(`/jobs/${jobId}/interview-slots`);
   };
 
   const setJobActionLoading = (jobId, isLoadingAction) => {
@@ -404,6 +409,18 @@ export default function ManagementTable() {
                         className="jobs-admin__action-btn"
                       >
                         <GroupsOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="תזמון ראיונות">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenInterviewScheduling(row.id)}
+                        aria-label={`תזמון ראיונות עבור ${row.title}`}
+                        disabled={Boolean(actionLoadingByJobId[row.id])}
+                        className="jobs-admin__action-btn"
+                      >
+                        <EventAvailableOutlinedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
 

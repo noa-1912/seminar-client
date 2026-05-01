@@ -17,6 +17,7 @@ import Settings from './components/team1/Settings/Settings'
 import Profiles from './components/team3/Profiles/Profiles'
 import StudentAvailabilityPage from './components/team5/availability/StudentAvailabilityPage.jsx'
 import CreateInterviewSlots from './components/team5/interviews/CreateInterviewSlots'
+import InterviewSlotsList from './components/team5/interviews/InterviewSlotsList'
 import ScheduledInterviews from './components/team5/interviews/ScheduledInterviews/ScheduledInterviews'
 import AdminDashboard from './components/admin/AdminDashboard'
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/jobs" element={<JobsBoardPage />} />
         <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
         <Route path="/jobs/:jobId/applications" element={<ManageJobApplications />} />
+        <Route path="/jobs/:jobId/interview-slots" element={<InterviewSlotsList />} />
         <Route path="/jobs/:jobId/interview-slots/new" element={<CreateInterviewSlots />} />
         <Route path="/personal-area" element={<PersonalArea />} />
         <Route path="/my-applications" element={<MyApplications />} />
