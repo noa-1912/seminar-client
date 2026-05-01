@@ -14,6 +14,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import LaptopOutlinedIcon from '@mui/icons-material/LaptopOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -35,6 +36,12 @@ export default function JobCard({ job, onClick }) {
     event?.stopPropagation?.();
     if (!canNavigateToDetails) return;
     navigate(`/jobs/${job.jobId}`);
+  };
+
+  const handleOpenInterviewSlots = (event) => {
+    event?.stopPropagation?.();
+    if (!canNavigateToDetails) return;
+    navigate(`/jobs/${job.jobId}/interview-slots/new`);
   };
 
   const content = (
@@ -141,11 +148,25 @@ export default function JobCard({ job, onClick }) {
             </Box>
           )}
 
-          <Box sx={{ pt: 1 }}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center" sx={{ pt: 1 }}>
             <Button variant="outlined" size="small" onClick={handleOpenDetails} disabled={!canNavigateToDetails}>
               לפרטי המשרה
             </Button>
-          </Box>
+            <Button
+              variant="text"
+              size="small"
+              startIcon={<EventAvailableOutlinedIcon fontSize="small" />}
+              onClick={handleOpenInterviewSlots}
+              disabled={!canNavigateToDetails}
+              sx={{
+                fontWeight: 600,
+                color: 'primary.main',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
+            >
+              קביעת ראיונות
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </CardContent>
