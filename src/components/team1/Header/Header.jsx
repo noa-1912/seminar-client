@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -40,13 +40,10 @@ function Header() {
   const hireLinkLogoSrc =
     mode === 'dark' ? '/logo-hirelink-dark.png' : '/logo-hirelink-light.png';
 
-  const navLinksResolved = useMemo(() => {
-    if (!isAuthenticated || !isManagerRole(user)) {
-      return navLinks;
-    }
-    const managerLink = { label: 'לוח בקרה למנהלת', path: '/admin' };
-    return [...navLinks.slice(0, 3), managerLink, ...navLinks.slice(3)];
-  }, [isAuthenticated, user]);
+  const showManagerDashboard =
+    import.meta.env.DEV || (isAuthenticated && isManagerRole(user));
+  const managerDashboardActive =
+    pathname === '/admin' || pathname.startsWith('/admin/');
 
   async function handleSignOut() {
     await signOut();
@@ -131,7 +128,7 @@ function Header() {
         </Box>
 
         <Box className="header-nav" component="nav">
-          {navLinksResolved.map((link) => {
+          {navLinks.map((link) => {
             const active = isLinkActive(pathname, link);
             return (
               <Button
@@ -156,6 +153,17 @@ function Header() {
           >
             {mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
           </IconButton>
+          {showManagerDashboard ? (
+            <Button
+              component={RouterLink}
+              to="/admin"
+              className={`header-manager-dashboard btn ${managerDashboardActive ? 'btn--secondary' : 'btn--primary'}`}
+              size="small"
+              variant={managerDashboardActive ? 'outlined' : 'contained'}
+            >
+              דשבורד מנהלת
+            </Button>
+          ) : null}
           {isAuthenticated ? (
             <>
               <Typography variant="body2" sx={{ display: { xs: 'none', md: 'block' } }}>
@@ -193,7 +201,7 @@ function Header() {
 
       {mobileOpen && (
         <Box className="header-mobile-nav">
-          {navLinksResolved.map((link) => {
+          {navLinks.map((link) => {
             const active = isLinkActive(pathname, link);
             return (
               <Button
@@ -208,6 +216,18 @@ function Header() {
               </Button>
             );
           })}
+          {showManagerDashboard ? (
+            <Button
+              component={RouterLink}
+              to="/admin"
+              onClick={() => setMobileOpen(false)}
+              fullWidth
+              className={`header-mobile-link btn ${managerDashboardActive ? 'btn--secondary' : ''}`}
+              variant={managerDashboardActive ? 'outlined' : 'text'}
+            >
+              דשבורד מנהלת
+            </Button>
+          ) : null}
           <Button
             onClick={() => {
               toggleMode();
