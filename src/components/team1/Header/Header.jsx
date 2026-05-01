@@ -40,8 +40,7 @@ function Header() {
   const hireLinkLogoSrc =
     mode === 'dark' ? '/logo-hirelink-dark.png' : '/logo-hirelink-light.png';
 
-  const showManagerDashboard =
-    import.meta.env.DEV || (isAuthenticated && isManagerRole(user));
+  const showManagerDashboard = isAuthenticated && isManagerRole(user);
   const managerDashboardActive =
     pathname === '/admin' || pathname.startsWith('/admin/');
 
